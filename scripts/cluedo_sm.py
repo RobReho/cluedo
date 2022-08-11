@@ -5,6 +5,7 @@ import rospy
 import smach
 import smach_ros
 import random
+from std_msgs.msg import Int32
 
 # define state EXPLORE
 class Explore(smach.State):
@@ -26,7 +27,6 @@ class Explore(smach.State):
 class Update_knowledge(smach.State):
     def __init__(self):
         smach.State.__init__(self, outcomes=['failed','succeded'])
-        self.rand = 0
 
     def execute(self, userdata):
         rospy.loginfo('Executing state UPDATE KNOWLEDGE')
