@@ -1,0 +1,417 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE rdf:RDF [
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY cluedo-ontology "http://www.emarolab.it/cluedo-ontology#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+]>
+
+
+<rdf:RDF xmlns="http://www.emarolab.it/cluedo-ontology#"
+     xml:base="http://www.emarolab.it/cluedo-ontology"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:cluedo-ontology="http://www.emarolab.it/cluedo-ontology#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <owl:Ontology rdf:about="http://www.emarolab.it/cluedo-ontology"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.emarolab.it/cluedo-ontology#what -->
+
+    <owl:ObjectProperty rdf:about="&cluedo-ontology;what">
+        <rdfs:domain rdf:resource="&cluedo-ontology;HYPOTHESIS"/>
+        <rdfs:range rdf:resource="&cluedo-ontology;WEAPON"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.emarolab.it/cluedo-ontology#where -->
+
+    <owl:ObjectProperty rdf:about="&cluedo-ontology;where">
+        <rdfs:domain rdf:resource="&cluedo-ontology;HYPOTHESIS"/>
+        <rdfs:range rdf:resource="&cluedo-ontology;PLACE"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.emarolab.it/cluedo-ontology#who -->
+
+    <owl:ObjectProperty rdf:about="&cluedo-ontology;who">
+        <rdfs:domain rdf:resource="&cluedo-ontology;HYPOTHESIS"/>
+        <rdfs:range rdf:resource="&cluedo-ontology;PERSON"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.emarolab.it/cluedo-ontology#hasID -->
+
+    <owl:DatatypeProperty rdf:about="&cluedo-ontology;hasID">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:domain rdf:resource="&cluedo-ontology;HYPOTHESIS"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.emarolab.it/cluedo-ontology#COMPLETED -->
+
+    <owl:Class rdf:about="&cluedo-ontology;COMPLETED">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&cluedo-ontology;what"/>
+                        <owl:onClass rdf:resource="&cluedo-ontology;WEAPON"/>
+                        <owl:minQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minQualifiedCardinality>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&cluedo-ontology;where"/>
+                        <owl:onClass rdf:resource="&cluedo-ontology;PLACE"/>
+                        <owl:minQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minQualifiedCardinality>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&cluedo-ontology;who"/>
+                        <owl:onClass rdf:resource="&cluedo-ontology;PERSON"/>
+                        <owl:minQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minQualifiedCardinality>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+        <rdfs:subClassOf rdf:resource="&cluedo-ontology;HYPOTHESIS"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.emarolab.it/cluedo-ontology#HYPOTHESIS -->
+
+    <owl:Class rdf:about="&cluedo-ontology;HYPOTHESIS">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&cluedo-ontology;what"/>
+                        <owl:allValuesFrom rdf:resource="&cluedo-ontology;WEAPON"/>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&cluedo-ontology;where"/>
+                        <owl:allValuesFrom rdf:resource="&cluedo-ontology;PLACE"/>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&cluedo-ontology;who"/>
+                        <owl:allValuesFrom rdf:resource="&cluedo-ontology;PERSON"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+        <rdfs:comment rdf:datatype="&xsd;string">PLAUSIBLE hypothesis are the one that are COMPLITED and NOT INCONSISTENT.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.emarolab.it/cluedo-ontology#INCONSISTENT -->
+
+    <owl:Class rdf:about="&cluedo-ontology;INCONSISTENT">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&cluedo-ontology;what"/>
+                        <owl:onClass rdf:resource="&cluedo-ontology;WEAPON"/>
+                        <owl:minQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">2</owl:minQualifiedCardinality>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&cluedo-ontology;where"/>
+                        <owl:onClass rdf:resource="&cluedo-ontology;PLACE"/>
+                        <owl:minQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">2</owl:minQualifiedCardinality>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&cluedo-ontology;who"/>
+                        <owl:onClass rdf:resource="&cluedo-ontology;PERSON"/>
+                        <owl:minQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">2</owl:minQualifiedCardinality>
+                    </owl:Restriction>
+                </owl:unionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+        <rdfs:subClassOf rdf:resource="&cluedo-ontology;COMPLETED"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.emarolab.it/cluedo-ontology#PERSON -->
+
+    <owl:Class rdf:about="&cluedo-ontology;PERSON"/>
+    
+
+
+    <!-- http://www.emarolab.it/cluedo-ontology#PLACE -->
+
+    <owl:Class rdf:about="&cluedo-ontology;PLACE"/>
+    
+
+
+    <!-- http://www.emarolab.it/cluedo-ontology#WEAPON -->
+
+    <owl:Class rdf:about="&cluedo-ontology;WEAPON"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.emarolab.it/cluedo-ontology#Green -->
+
+    <owl:NamedIndividual rdf:about="&cluedo-ontology;Green">
+        <rdf:type rdf:resource="&cluedo-ontology;PERSON"/>
+        <hasID>003</hasID>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.emarolab.it/cluedo-ontology#Mustard -->
+
+    <owl:NamedIndividual rdf:about="&cluedo-ontology;Mustard">
+        <rdf:type rdf:resource="&cluedo-ontology;PERSON"/>
+        <hasID>006</hasID>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.emarolab.it/cluedo-ontology#Peacock -->
+
+    <owl:NamedIndividual rdf:about="&cluedo-ontology;Peacock">
+        <rdf:type rdf:resource="&cluedo-ontology;PERSON"/>
+        <hasID>005</hasID>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.emarolab.it/cluedo-ontology#Plum -->
+
+    <owl:NamedIndividual rdf:about="&cluedo-ontology;Plum">
+        <rdf:type rdf:resource="&cluedo-ontology;PERSON"/>
+        <hasID>002</hasID>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.emarolab.it/cluedo-ontology#Scarlet -->
+
+    <owl:NamedIndividual rdf:about="&cluedo-ontology;Scarlet">
+        <rdf:type rdf:resource="&cluedo-ontology;PERSON"/>
+        <hasID>001</hasID>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.emarolab.it/cluedo-ontology#White -->
+
+    <owl:NamedIndividual rdf:about="&cluedo-ontology;White">
+        <rdf:type rdf:resource="&cluedo-ontology;PERSON"/>
+        <hasID>004</hasID>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.emarolab.it/cluedo-ontology#ballroom -->
+
+    <owl:NamedIndividual rdf:about="&cluedo-ontology;ballroom">
+        <rdf:type rdf:resource="&cluedo-ontology;PLACE"/>
+        <hasID>016</hasID>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.emarolab.it/cluedo-ontology#billiard_room -->
+
+    <owl:NamedIndividual rdf:about="&cluedo-ontology;billiard_room">
+        <rdf:type rdf:resource="&cluedo-ontology;PLACE"/>
+        <hasID>017</hasID>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.emarolab.it/cluedo-ontology#candlestick -->
+
+    <owl:NamedIndividual rdf:about="&cluedo-ontology;candlestick">
+        <rdf:type rdf:resource="&cluedo-ontology;WEAPON"/>
+        <hasID>007</hasID>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.emarolab.it/cluedo-ontology#conservatory -->
+
+    <owl:NamedIndividual rdf:about="&cluedo-ontology;conservatory">
+        <rdf:type rdf:resource="&cluedo-ontology;PLACE"/>
+        <hasID>014</hasID>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.emarolab.it/cluedo-ontology#dagger -->
+
+    <owl:NamedIndividual rdf:about="&cluedo-ontology;dagger">
+        <rdf:type rdf:resource="&cluedo-ontology;WEAPON"/>
+        <hasID>012</hasID>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.emarolab.it/cluedo-ontology#dining_room -->
+
+    <owl:NamedIndividual rdf:about="&cluedo-ontology;dining_room">
+        <rdf:type rdf:resource="&cluedo-ontology;PLACE"/>
+        <hasID>019</hasID>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.emarolab.it/cluedo-ontology#hall -->
+
+    <owl:NamedIndividual rdf:about="&cluedo-ontology;hall">
+        <rdf:type rdf:resource="&cluedo-ontology;PLACE"/>
+        <hasID>021</hasID>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.emarolab.it/cluedo-ontology#kitchen -->
+
+    <owl:NamedIndividual rdf:about="&cluedo-ontology;kitchen">
+        <rdf:type rdf:resource="&cluedo-ontology;PLACE"/>
+        <hasID>020</hasID>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.emarolab.it/cluedo-ontology#lead_pipe -->
+
+    <owl:NamedIndividual rdf:about="&cluedo-ontology;lead_pipe">
+        <rdf:type rdf:resource="&cluedo-ontology;WEAPON"/>
+        <hasID>011</hasID>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.emarolab.it/cluedo-ontology#library -->
+
+    <owl:NamedIndividual rdf:about="&cluedo-ontology;library">
+        <rdf:type rdf:resource="&cluedo-ontology;PLACE"/>
+        <hasID>013</hasID>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.emarolab.it/cluedo-ontology#lounge -->
+
+    <owl:NamedIndividual rdf:about="&cluedo-ontology;lounge">
+        <rdf:type rdf:resource="&cluedo-ontology;PLACE"/>
+        <hasID>015</hasID>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.emarolab.it/cluedo-ontology#revolver -->
+
+    <owl:NamedIndividual rdf:about="&cluedo-ontology;revolver">
+        <rdf:type rdf:resource="&cluedo-ontology;WEAPON"/>
+        <hasID>010</hasID>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.emarolab.it/cluedo-ontology#rope -->
+
+    <owl:NamedIndividual rdf:about="&cluedo-ontology;rope">
+        <rdf:type rdf:resource="&cluedo-ontology;WEAPON"/>
+        <hasID>009</hasID>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.emarolab.it/cluedo-ontology#spanner -->
+
+    <owl:NamedIndividual rdf:about="&cluedo-ontology;spanner">
+        <rdf:type rdf:resource="&cluedo-ontology;WEAPON"/>
+        <hasID>008</hasID>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.emarolab.it/cluedo-ontology#study -->
+
+    <owl:NamedIndividual rdf:about="&cluedo-ontology;study">
+        <rdf:type rdf:resource="&cluedo-ontology;PLACE"/>
+        <hasID>018</hasID>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // General axioms
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;AllDisjointClasses"/>
+        <owl:members rdf:parseType="Collection">
+            <rdf:Description rdf:about="&cluedo-ontology;PERSON"/>
+            <rdf:Description rdf:about="&cluedo-ontology;PLACE"/>
+            <rdf:Description rdf:about="&cluedo-ontology;WEAPON"/>
+        </owl:members>
+    </rdf:Description>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 3.4.2) http://owlapi.sourceforge.net -->
+
