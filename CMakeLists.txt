@@ -161,7 +161,8 @@ include_directories(
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
  catkin_install_python(PROGRAMS
-   scripts/server.py  scripts/client.py  scripts/cluedo_sm.py
+   scripts/server.py  scripts/client.py  scripts/cluedo_sm.py  scripts/client_test.py
+   scripts/ontology_server.py
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
  )
 
