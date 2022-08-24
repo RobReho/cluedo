@@ -59,6 +59,7 @@ find_package(catkin REQUIRED COMPONENTS
    FILES
     Hypothesis.srv
     Discard.srv
+    Compare.srv
  )
 
 ## Generate actions in the 'action' folder
@@ -161,8 +162,9 @@ include_directories(
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
  catkin_install_python(PROGRAMS
-   scripts/server.py  scripts/client.py  scripts/cluedo_sm.py  scripts/client_test.py
-   scripts/ontology_server.py
+   scripts/server.py  
+   scripts/armor_functions.py  
+   scripts/cluedo_sm.py  
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
  )
 

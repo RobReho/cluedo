@@ -1,12 +1,12 @@
 import rospy
 import random
 from std_srvs.srv import *
-from cluedo.srv import Hypothesis, Discard
+from cluedo.srv import Hypothesis, Discard, Compare
 
 
-people_list = ["001","002","003","004","005","006"]
-weapons_list = ["007","008","009","010","011","012"]
-places_list = ["013","014","015","016","017","018","019","020","021"]
+people_list = ["Scarlet","Plum","Green","White","Peacock","Mustard"]
+weapons_list = ["candlestik","rope","lead pipe","revolver","spanner","dagger"]
+places_list = ["library","conservatory","lounge","ballroom","billiard room","kitchen","dining room","hall","study"]
 # Murder
 who = ""
 what = ""
@@ -15,18 +15,23 @@ where = ""
 ID1 = []
 ID2 = []
 ID3 = []
-ID4 = []
-ID5 = []
-ID6 = []
-source_ID = [ID1,ID2,ID3,ID4,ID5,ID6]
+ID0 = []
+source_ID = [ID0,ID1,ID2,ID3]
+tourn_counter = 0
 
 def distr_hints():
     hints = people_list + weapons_list + places_list
+    random.shuffle(hints)
     
-    for i in range(len(source_ID)):
-      for j in range (0, 3):
-        source_ID[i].append(random.choice(hints))
-      print(source_ID[i])
+    while hints:
+        for i in range (0, 4):
+            if hints:
+                source_ID[i].append( hints.pop() )  
+        
+    print(ID0)
+    print(ID1)
+    print(ID2)
+    print(ID3)
     
     
 def gen_murder(req):
@@ -51,27 +56,83 @@ def gen_murder(req):
     return who, what, where
 
 
+def deliver_hint(req):
+    global tourn_counter
+    req.person
+    req.weapon
+    req.place
+    same_person = False
+    same_weapon = False
+    same_place = False
+    print('your hyp is:',req.person,req.weapon,req.place)
+    print('source:',tourn_counter)
 
-def remove_discarded(item):
-    if item in people_list:
-      print("hvi")
-      people_list.remove(item)
-      print("item ",item,"has been removed")
-    elif item in weapons_list:
-      weapons_list.remove(item)
-      print("item ",item,"has been removed")
-    elif item in places_list:
-      places_list.remove(item)
-      print("item ",item,"has been removed")
-      
-    return[]
+    if tourn_counter == 0:
+        same_person = req.person in ID0
+        same_weapon = req.weapon in ID0
+        same_place = req.place in ID0
+        print(same_person,same_weapon,same_place)
+        
+    elif tourn_counter == 2:
+        same_person = req.person in ID1
+        same_weapon = req.weapon in ID1
+        same_place = req.place in ID1
+        print(same_person,same_weapon,same_place)
+
+    elif tourn_counter == 3:
+        same_person = req.person in ID2
+        same_weapon = req.weapon in ID2
+        same_place = req.place in ID2
+        print(same_person,same_weapon,same_place)
+        
+    elif tourn_counter == 4:
+        same_person = req.person in ID3
+        same_weapon = req.weapon in ID3
+        same_place = req.place in ID3
+        print(same_person,same_weapon,same_place)
+        
+    tourn_counter = (tourn_counter + 1)%4
+    return same_person,same_weapon,same_place
+
+
+def verify_solution(req):
+    global who, what, where
+    same_person = False
+    same_weapon = False
+    same_place = False
+    if req.person == who:
+        same_person = True
+    if req.weapon == what:
+        same_weapon = True
+    if req.place == where:
+        same_place = True
+        
+    return same_person,same_weapon,same_place
+        
+
+    
+#def remove_discarded(item):
+#    if item in people_list:
+#      print("hvi")
+#      people_list.remove(item)
+#      print("item ",item,"has been removed")
+#    elif item in weapons_list:
+#      weapons_list.remove(item)
+#      print("item ",item,"has been removed")
+#    elif item in places_list:
+#      places_list.remove(item)
+#      print("item ",item,"has been removed")
+#      
+#    return[]
       
       
 def main():
-    rospy.init_node('generate_hypothesis')
+    rospy.init_node('oracle')
     
-    rospy.Service('random_hypothesis', Hypothesis, gen_murder)
-    rospy.Service('remove_hypothesis', Discard, remove_discarded)
+    rospy.Service('generate_murder', Hypothesis, gen_murder)
+#    rospy.Service('remove_hypothesis', Discard, remove_discarded)
+    rospy.Service('query_source', Compare, deliver_hint)
+    rospy.Service('verify_solution', Compare, verify_solution)
     
     rate = rospy.Rate(20)
     while not rospy.is_shutdown():
