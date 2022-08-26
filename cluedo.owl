@@ -1,0 +1,440 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE Ontology [
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY xml "http://www.w3.org/XML/1998/namespace" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+]>
+
+
+<Ontology xmlns="http://www.w3.org/2002/07/owl#"
+     xml:base="http://www.emarolab.it/cluedo-ontology"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     ontologyIRI="http://www.emarolab.it/cluedo-ontology">
+    <Prefix name="" IRI="http://www.emarolab.it/cluedo-ontology#"/>
+    <Prefix name="owl" IRI="http://www.w3.org/2002/07/owl#"/>
+    <Prefix name="rdf" IRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+    <Prefix name="xsd" IRI="http://www.w3.org/2001/XMLSchema#"/>
+    <Prefix name="rdfs" IRI="http://www.w3.org/2000/01/rdf-schema#"/>
+    <Prefix name="cluedo-ontology" IRI="http://www.emarolab.it/cluedo-ontology#"/>
+    <Declaration>
+        <Class IRI="#COMPLETED"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#HYPOTHESIS"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#INCONSISTENT"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#PERSON"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#PLACE"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#WEAPON"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#what"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#where"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#who"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#hasID"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#isSuspect"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Green"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Mustard"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Peacock"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Plum"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Scarlet"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#White"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#ballroom"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#billiard_room"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#candlestick"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#conservatory"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#dagger"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#dining_room"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#hall"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#kitchen"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#lead_pipe"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#library"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#lounge"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#revolver"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#rope"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#spanner"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#study"/>
+    </Declaration>
+    <EquivalentClasses>
+        <Class IRI="#COMPLETED"/>
+        <ObjectIntersectionOf>
+            <ObjectMinCardinality cardinality="1">
+                <ObjectProperty IRI="#what"/>
+                <Class IRI="#WEAPON"/>
+            </ObjectMinCardinality>
+            <ObjectMinCardinality cardinality="1">
+                <ObjectProperty IRI="#where"/>
+                <Class IRI="#PLACE"/>
+            </ObjectMinCardinality>
+            <ObjectMinCardinality cardinality="1">
+                <ObjectProperty IRI="#who"/>
+                <Class IRI="#PERSON"/>
+            </ObjectMinCardinality>
+        </ObjectIntersectionOf>
+    </EquivalentClasses>
+    <EquivalentClasses>
+        <Class IRI="#HYPOTHESIS"/>
+        <ObjectIntersectionOf>
+            <ObjectAllValuesFrom>
+                <ObjectProperty IRI="#what"/>
+                <Class IRI="#WEAPON"/>
+            </ObjectAllValuesFrom>
+            <ObjectAllValuesFrom>
+                <ObjectProperty IRI="#where"/>
+                <Class IRI="#PLACE"/>
+            </ObjectAllValuesFrom>
+            <ObjectAllValuesFrom>
+                <ObjectProperty IRI="#who"/>
+                <Class IRI="#PERSON"/>
+            </ObjectAllValuesFrom>
+        </ObjectIntersectionOf>
+    </EquivalentClasses>
+    <EquivalentClasses>
+        <Class IRI="#INCONSISTENT"/>
+        <ObjectUnionOf>
+            <ObjectMinCardinality cardinality="2">
+                <ObjectProperty IRI="#what"/>
+                <Class IRI="#WEAPON"/>
+            </ObjectMinCardinality>
+            <ObjectMinCardinality cardinality="2">
+                <ObjectProperty IRI="#where"/>
+                <Class IRI="#PLACE"/>
+            </ObjectMinCardinality>
+            <ObjectMinCardinality cardinality="2">
+                <ObjectProperty IRI="#who"/>
+                <Class IRI="#PERSON"/>
+            </ObjectMinCardinality>
+        </ObjectUnionOf>
+    </EquivalentClasses>
+    <SubClassOf>
+        <Class IRI="#COMPLETED"/>
+        <Class IRI="#HYPOTHESIS"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#INCONSISTENT"/>
+        <Class IRI="#COMPLETED"/>
+    </SubClassOf>
+    <DisjointClasses>
+        <Class IRI="#PERSON"/>
+        <Class IRI="#PLACE"/>
+        <Class IRI="#WEAPON"/>
+    </DisjointClasses>
+    <ClassAssertion>
+        <Class IRI="#PERSON"/>
+        <NamedIndividual IRI="#Green"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#PERSON"/>
+        <NamedIndividual IRI="#Mustard"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#PERSON"/>
+        <NamedIndividual IRI="#Peacock"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#PERSON"/>
+        <NamedIndividual IRI="#Plum"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#PERSON"/>
+        <NamedIndividual IRI="#Scarlet"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#PERSON"/>
+        <NamedIndividual IRI="#White"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#PLACE"/>
+        <NamedIndividual IRI="#ballroom"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#PLACE"/>
+        <NamedIndividual IRI="#billiard_room"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#WEAPON"/>
+        <NamedIndividual IRI="#candlestick"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#PLACE"/>
+        <NamedIndividual IRI="#conservatory"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#WEAPON"/>
+        <NamedIndividual IRI="#dagger"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#PLACE"/>
+        <NamedIndividual IRI="#dining_room"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#PLACE"/>
+        <NamedIndividual IRI="#hall"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#PLACE"/>
+        <NamedIndividual IRI="#kitchen"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#WEAPON"/>
+        <NamedIndividual IRI="#lead_pipe"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#PLACE"/>
+        <NamedIndividual IRI="#library"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#PLACE"/>
+        <NamedIndividual IRI="#lounge"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#WEAPON"/>
+        <NamedIndividual IRI="#revolver"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#WEAPON"/>
+        <NamedIndividual IRI="#rope"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#WEAPON"/>
+        <NamedIndividual IRI="#spanner"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#PLACE"/>
+        <NamedIndividual IRI="#study"/>
+    </ClassAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#hasID"/>
+        <NamedIndividual IRI="#Green"/>
+        <Literal datatypeIRI="&rdf;PlainLiteral">003</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#isSuspect"/>
+        <NamedIndividual IRI="#Green"/>
+        <Literal datatypeIRI="&xsd;boolean">true</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#hasID"/>
+        <NamedIndividual IRI="#Mustard"/>
+        <Literal datatypeIRI="&rdf;PlainLiteral">006</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#hasID"/>
+        <NamedIndividual IRI="#Peacock"/>
+        <Literal datatypeIRI="&rdf;PlainLiteral">005</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#hasID"/>
+        <NamedIndividual IRI="#Plum"/>
+        <Literal datatypeIRI="&rdf;PlainLiteral">002</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#hasID"/>
+        <NamedIndividual IRI="#Scarlet"/>
+        <Literal datatypeIRI="&rdf;PlainLiteral">001</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#hasID"/>
+        <NamedIndividual IRI="#White"/>
+        <Literal datatypeIRI="&rdf;PlainLiteral">004</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#hasID"/>
+        <NamedIndividual IRI="#ballroom"/>
+        <Literal datatypeIRI="&rdf;PlainLiteral">016</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#hasID"/>
+        <NamedIndividual IRI="#billiard_room"/>
+        <Literal datatypeIRI="&rdf;PlainLiteral">017</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#hasID"/>
+        <NamedIndividual IRI="#candlestick"/>
+        <Literal datatypeIRI="&rdf;PlainLiteral">007</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#hasID"/>
+        <NamedIndividual IRI="#conservatory"/>
+        <Literal datatypeIRI="&rdf;PlainLiteral">014</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#hasID"/>
+        <NamedIndividual IRI="#dagger"/>
+        <Literal datatypeIRI="&rdf;PlainLiteral">012</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#hasID"/>
+        <NamedIndividual IRI="#dining_room"/>
+        <Literal datatypeIRI="&rdf;PlainLiteral">019</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#hasID"/>
+        <NamedIndividual IRI="#hall"/>
+        <Literal datatypeIRI="&rdf;PlainLiteral">021</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#hasID"/>
+        <NamedIndividual IRI="#kitchen"/>
+        <Literal datatypeIRI="&rdf;PlainLiteral">020</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#hasID"/>
+        <NamedIndividual IRI="#lead_pipe"/>
+        <Literal datatypeIRI="&rdf;PlainLiteral">011</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#hasID"/>
+        <NamedIndividual IRI="#library"/>
+        <Literal datatypeIRI="&rdf;PlainLiteral">013</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#hasID"/>
+        <NamedIndividual IRI="#lounge"/>
+        <Literal datatypeIRI="&rdf;PlainLiteral">015</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#hasID"/>
+        <NamedIndividual IRI="#revolver"/>
+        <Literal datatypeIRI="&rdf;PlainLiteral">010</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#hasID"/>
+        <NamedIndividual IRI="#rope"/>
+        <Literal datatypeIRI="&rdf;PlainLiteral">009</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#hasID"/>
+        <NamedIndividual IRI="#spanner"/>
+        <Literal datatypeIRI="&rdf;PlainLiteral">008</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#hasID"/>
+        <NamedIndividual IRI="#study"/>
+        <Literal datatypeIRI="&rdf;PlainLiteral">018</Literal>
+    </DataPropertyAssertion>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#what"/>
+        <Class IRI="#HYPOTHESIS"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#where"/>
+        <Class IRI="#HYPOTHESIS"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#who"/>
+        <Class IRI="#HYPOTHESIS"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#what"/>
+        <Class IRI="#WEAPON"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#where"/>
+        <Class IRI="#PLACE"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#who"/>
+        <Class IRI="#PERSON"/>
+    </ObjectPropertyRange>
+    <FunctionalDataProperty>
+        <DataProperty IRI="#hasID"/>
+    </FunctionalDataProperty>
+    <DataPropertyDomain>
+        <DataProperty IRI="#hasID"/>
+        <Class IRI="#HYPOTHESIS"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#isSuspect"/>
+        <Class IRI="#PERSON"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#isSuspect"/>
+        <Class IRI="#PLACE"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#isSuspect"/>
+        <Class IRI="#WEAPON"/>
+    </DataPropertyDomain>
+    <DataPropertyRange>
+        <DataProperty IRI="#hasID"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#isSuspect"/>
+        <Datatype abbreviatedIRI="xsd:boolean"/>
+    </DataPropertyRange>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#HYPOTHESIS</IRI>
+        <Literal datatypeIRI="&xsd;string">PLAUSIBLE hypothesis are the one that are COMPLITED and NOT INCONSISTENT.</Literal>
+    </AnnotationAssertion>
+</Ontology>
+
+
+
+<!-- Generated by the OWL API (version 3.4.2) http://owlapi.sourceforge.net -->
+
