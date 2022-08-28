@@ -27,7 +27,7 @@ srv_client_query_source_ = rospy.ServiceProxy('/query_source', Compare)
 srv_client_final_hypothesis_ = rospy.ServiceProxy('/verify_solution', Compare)
 srv_client_generate_murder_ = rospy.ServiceProxy('/generate_murder', Hypothesis)  
 
-     
+
 #------------------------ARMOR COMMUNICATION----------------------------------
 class Armor_communication():
     ##
@@ -113,7 +113,7 @@ class Armor_communication():
         except rospy.ServiceException as e:
             print(e)
             
-    def make_hypothesis(self,person,weapon,place):
+    def make_hypothesis(self,hyp):
         ##
         #\brief Insert an hypothesis in the system
         #@param hypothesis the hypothesis that will be inserted in the system, which is of type hypothesis
@@ -251,8 +251,11 @@ class Explore(smach.State):
 
     def execute(self, userdata):
         rospy.loginfo('Executing state EXPLORE')
-        userdata.place = random.choice(armor.retrieve_class('PLACE'))
-        print('I am going to the',userdata.place)
+        pl_list = armor.retrieve_class('PLACE')
+        if pl_list:
+            userdata.place = random.choice(pl_list)
+            print('I am going to the',userdata.place)
+            
         rospy.sleep(3)  # Reach place
 
         return 'found_source'
@@ -274,20 +277,24 @@ class Make_hypothesis(smach.State):
 
     def execute(self, userdata):
         rospy.loginfo('Executing state MAKE HYPOTHESIS')
+        pe_list = armor.retrieve_class('PERSON')
+        we_list = armor.retrieve_class('WEAPON')
         
-        userdata.person = random.choice(armor.retrieve_class('PERSON'))
-        userdata.weapon = random.choice(armor.retrieve_class('WEAPON'))
-        
-        armor.make_hypothesis(userdata.person, userdata.weapon, userdata.place)
-        armor.reason()
+        if pe_list and we_list:
+            userdata.person = random.choice(pe_list)
+            userdata.weapon = random.choice(we_list)
+            armor.make_hypothesis(userdata.person, userdata.weapon, userdata.place)
+            armor.reason()
             
-        if armor.retrieve_class('CONSISTENT') != 'Null':
-            if armor.retrieve_class('PERSON') == 1 and armor.retrieve_class('WEAPON') == 1 and armor.retrieve_class('PLACE') == 1 :
-                # final hypothesis
-                return 'final hypothesis'
+            if armor.retrieve_class('CONSISTENT') != 'Null':
+                if pe_list == 1 and we_list == 1 and armor.retrieve_class('PLACE') == 1 :
+                    # final hypothesis
+                    return 'final hypothesis'
+                else:
+                    print('Hypothesis: It was',userdata.person,'with the',userdata.weapon,'in the',userdata.place)
+                    return 'consistent'
             else:
-                print('Hypothesis: It was',userdata.person,'with the',userdata.weapon,'in the',userdata.place)
-                return 'consistent'
+                return 'inconsistent'
         else:
             return 'inconsistent'
         
@@ -308,7 +315,7 @@ class Query_source(smach.State):
     def execute(self, userdata):
         rospy.loginfo('Executing state QUERY SOURCE')
         print('Hypothesis: It was',userdata.person,'with the',userdata.weapon,'in the',userdata.place)
-
+        
         rospy.sleep(3)
         
         resp = srv_client_query_source_(userdata.person, userdata.weapon, userdata.place)
@@ -346,6 +353,7 @@ class Reach_oracle(smach.State):
         rospy.sleep(3)  # reaching the oracle
         
         return 'reached'
+    # return 'failed' # to be implemented in further iteration
         
         
 # define state DELIVER HYPOTHESIS
@@ -358,9 +366,12 @@ class Deliver_hypothesis(smach.State):
     def execute(self, userdata):
         rospy.loginfo('Executing state DELIVER HYPOTHESIS')
         
-        print('Hypothesis: It was',userdata.person,'with the',userdata.weapon,'in the',userdata.place)
-
-        return 'succeded'
+        if userdata.person and userdata.weapon and userdata.place:
+            print('Hypothesis: It was',userdata.person,'with the',userdata.weapon,'in the',userdata.place)
+            return 'succeded'
+        else:
+            print('Te hypothesis has failed to be delivered')
+            return 'failed'
         
 
 # define state HYPOTHESIS CHECK 

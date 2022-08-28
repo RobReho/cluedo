@@ -9,9 +9,12 @@ import rospy
 from std_srvs.srv import *
 from armor_msgs.msg import * 
 from armor_msgs.srv import * 
-from cluedo.srv import Hypothesis, Discard
+from cluedo.srv import Hypothesis, Discard, Hints
 from os.path import dirname, realpath
 import random
+
+srv_client_get_hint_ = rospy.ServiceProxy('/get_hint', Hints)
+srv_client_remove_discarded_ = rospy.ServiceProxy('/remove_discarded', Discard)
 
 class Hypothesis_():
     ##
@@ -133,90 +136,40 @@ class Armor_communication():
     
             
             
-    def make_hypothesis(self,person,weapon,place):
+    def make_hypothesis(self,hyp,hypID):
         ##
         #\brief Insert an hypothesis in the system
         #@param hypothesis the hypothesis that will be inserted in the system, which is of type hypothesis
+        objProp = ['who','what','here']
+        class_ = ['PERSON','WEAPON','PLACE']
         
-
-        try:
-            req=ArmorDirectiveReq()
-            req.client_name= 'cluedo'
-            req.reference_name= 'ontology'
-            req.command= 'ADD'
-            req.primary_command_spec= 'OBJECTPROP'
-            req.secondary_command_spec= 'IND'
-            req.args= ['who','HP',person]
-            msg = self.armor_service(req)
+        for i in range(len(hyp)-1):
+            try:
+                req=ArmorDirectiveReq()
+                req.client_name= 'cluedo'
+                req.reference_name= 'ontology'
+                req.command= 'ADD'
+                req.primary_command_spec= 'OBJECTPROP'
+                req.secondary_command_spec= 'IND'
+                req.args= [objProp[i], hypID, hyp[i]]
+                msg = self.armor_service(req)
+                
+            except rospy.ServiceException as e:
+                print(e)
+    
+            try:
+                req=ArmorDirectiveReq()
+                req.client_name= 'cluedo'
+                req.reference_name= 'ontology'
+                req.command= 'ADD'
+                req.primary_command_spec= 'IND'
+                req.secondary_command_spec= 'CLASS'
+                req.args= [hyp[i],class_[i]]
+                msg = self.armor_service(req)
+                
+            except rospy.ServiceException as e:
+                print(e)
             
-        except rospy.ServiceException as e:
-            print(e)
-
-        try:
-            req=ArmorDirectiveReq()
-            req.client_name= 'cluedo'
-            req.reference_name= 'ontology'
-            req.command= 'ADD'
-            req.primary_command_spec= 'IND'
-            req.secondary_command_spec= 'CLASS'
-            req.args= [person,'PERSON']
-            msg = self.armor_service(req)
-            
-        except rospy.ServiceException as e:
-            print(e)
-            
-        try:
-            req=ArmorDirectiveReq()
-            req.client_name= 'cluedo'
-            req.reference_name= 'ontology'
-            req.command= 'ADD'
-            req.primary_command_spec= 'OBJECTPROP'
-            req.secondary_command_spec= 'IND'
-            req.args= ['what','HP',weapon]
-            msg = self.armor_service(req)
-            
-        except rospy.ServiceException as e:
-            print(e)
-
-        try:
-            req=ArmorDirectiveReq()
-            req.client_name= 'cluedo'
-            req.reference_name= 'ontology'
-            req.command= 'ADD'
-            req.primary_command_spec= 'IND'
-            req.secondary_command_spec= 'CLASS'
-            req.args= [weapon,'WEAPON']
-            msg = self.armor_service(req)
-            
-        except rospy.ServiceException as e:
-            print(e)
-            
-        try:
-            req=ArmorDirectiveReq()
-            req.client_name= 'cluedo'
-            req.reference_name= 'ontology'
-            req.command= 'ADD'
-            req.primary_command_spec= 'OBJECTPROP'
-            req.secondary_command_spec= 'IND'
-            req.args= ['where','HP',place]
-            msg = self.armor_service(req)
-            
-        except rospy.ServiceException as e:
-            print(e)
-
-        try:
-            req=ArmorDirectiveReq()
-            req.client_name= 'cluedo'
-            req.reference_name= 'ontology'
-            req.command= 'ADD'
-            req.primary_command_spec= 'IND'
-            req.secondary_command_spec= 'CLASS'
-            req.args= [place,'PLACE']
-            msg = self.armor_service(req)
-            
-        except rospy.ServiceException as e:
-            print(e)
-        
         
         
     def remove_instance(self,item,_class):
@@ -233,6 +186,37 @@ class Armor_communication():
         except rospy.ServiceException as e:
             print(e)
  
+    
+    def retrieve_dataPropriety(self,dataProp,ind):
+        try:
+            req=ArmorDirectiveReq()
+            req.client_name= 'cluedo'
+            req.reference_name= 'ontology'
+            req.command= 'QUERY'
+            req.primary_command_spec= 'DATAPROP'
+            req.secondary_command_spec= 'IND'
+            req.args= [dataProp,ind]
+            msg = self.armor_service(req)
+            
+        except rospy.ServiceException as e:
+            print(e)
+    
+    
+    def add_dataPropriety(self,dataProp,ind,_type,value):
+        try:
+            req=ArmorDirectiveReq()
+            req.client_name= 'cluedo'
+            req.reference_name= 'ontology'
+            req.command= 'ADD'
+            req.primary_command_spec= 'DATAPROP'
+            req.secondary_command_spec= 'IND'
+            req.args= [dataProp,ind,_type,value]
+            msg = self.armor_service(req)
+            
+        except rospy.ServiceException as e:
+            print(e)
+            
+            
   
 def main():
     rospy.init_node('ontology_client')
@@ -240,16 +224,39 @@ def main():
     armor.__init__()
     armor.log_to_file()
     armor.load_file()
-    
-    place_list = armor.retrieve_class('PLACE')
-    print(place_list)
-    place = random.choice(place_list)
-    print(place)
-    armor.remove_instance(place,'PLACE')
+#    ind = 0
+#    hypID = 'HP'+str(ind)
+    hint_list = []
+    print('ready')
+    hp = srv_client_get_hint_()
+    print(hp)
+    hint_list.append(hp.hint0)
+    hint_list.append(hp.hint1)
+    hint_list.append(hp.hint2)
+    hint_list.append(hp.hint3)
+
+    armor.make_hypothesis(hint_list,'HP_0')
     armor.reason()
-    rospy.sleep(1)
-    remaning = armor.retrieve_class('PLACE')
-    print(remaning)
+    print(armor.retrieve_class('HYPOTHESIS'))
+    
+    
+    
+    
+    #srv_client_remove_discarded_()
+#    armor.add_dataPropriety('isSuspect','Scarlet','boolean','true')
+#    rospy.sleep(2)
+#    print(armor.retrieve_dataPropriety('isSuspect','Green'))
+#    print(armor.retrieve_dataPropriety('isSuspect','Scarlet'))
+    
+#    while len(armor.retrieve_class('PLACE')) != 0:
+#        place_list = armor.retrieve_class('PLACE')
+#        print(place_list)
+#        place = random.choice(place_list)
+#        print(place)
+#        armor.remove_instance(place,'PLACE')
+#        armor.reason()
+#        rospy.sleep(1)
+        
     
 #    person = random.choice(pe)
 #    

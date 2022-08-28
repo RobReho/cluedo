@@ -60,6 +60,7 @@ find_package(catkin REQUIRED COMPONENTS
     Hypothesis.srv
     Discard.srv
     Compare.srv
+    Hints.srv
  )
 
 ## Generate actions in the 'action' folder
@@ -165,6 +166,8 @@ include_directories(
    scripts/server.py  
    scripts/armor_functions.py  
    scripts/cluedo_sm.py  
+   scripts/test.py
+   scripts/armor.py
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
  )
 
