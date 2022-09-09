@@ -9,12 +9,19 @@ import rospy
 from std_srvs.srv import *
 from armor_msgs.msg import * 
 from armor_msgs.srv import * 
-from cluedo.srv import Hypothesis, Discard, Hints
+from cluedo.srv import Hypothesis, Discard, Hints, Compare
 from os.path import dirname, realpath
 import random
 
+people_list = ["Scarlet","Plum","Green","White","Peacock","Mustard"]
+weapons_list = ["candlestik","rope","lead_pipe","revolver","spanner","dagger"]
+places_list = ["library","conservatory","lounge","ballroom","billiard_room","kitchen","dining_room","hall","study"]
+
 srv_client_get_hint_ = rospy.ServiceProxy('/get_hint', Hints)
 srv_client_remove_discarded_ = rospy.ServiceProxy('/remove_discarded', Discard)
+srv_client_query_source_ = rospy.ServiceProxy('/query_source', Compare)
+srv_client_final_hypothesis_ = rospy.ServiceProxy('/verify_solution', Compare)
+srv_client_generate_murder_ = rospy.ServiceProxy('/generate_murder', Hypothesis)  
 
 class Hypothesis_():
     ##
@@ -140,18 +147,25 @@ class Armor_communication():
         ##
         #\brief Insert an hypothesis in the system
         #@param hypothesis the hypothesis that will be inserted in the system, which is of type hypothesis
-        objProp = ['who','what','here']
-        class_ = ['PERSON','WEAPON','PLACE']
         
-        for i in range(len(hyp)-1):
+        for i in range(len(hyp)):
             try:
                 req=ArmorDirectiveReq()
                 req.client_name= 'cluedo'
                 req.reference_name= 'ontology'
                 req.command= 'ADD'
                 req.primary_command_spec= 'OBJECTPROP'
-                req.secondary_command_spec= 'IND'
-                req.args= [objProp[i], hypID, hyp[i]]
+                req.secondary_command_spec= 'IND'  
+                if hyp[i] in people_list:
+                    
+                    req.args= ['who', hypID, hyp[i]]
+                elif hyp[i] in weapons_list:
+                   
+                    req.args= ['what', hypID, hyp[i]]
+                elif hyp[i] in places_list:
+                   
+                    req.args= ['where', hypID, hyp[i]]
+                print(hyp[i])
                 msg = self.armor_service(req)
                 
             except rospy.ServiceException as e:
@@ -164,7 +178,13 @@ class Armor_communication():
                 req.command= 'ADD'
                 req.primary_command_spec= 'IND'
                 req.secondary_command_spec= 'CLASS'
-                req.args= [hyp[i],class_[i]]
+                if hyp[i] in people_list:
+                    req.args= [hyp[i],'PERSON']
+                elif hyp[i] in weapons_list:
+                    req.args= [hyp[i],'WEAPON']
+                elif hyp[i] in places_list:
+                    req.args= [hyp[i],'PLACE']
+                
                 msg = self.armor_service(req)
                 
             except rospy.ServiceException as e:
@@ -226,21 +246,38 @@ def main():
     armor.load_file()
 #    ind = 0
 #    hypID = 'HP'+str(ind)
-    hint_list = []
-    print('ready')
-    hp = srv_client_get_hint_()
-    print(hp)
-    hint_list.append(hp.hint0)
-    hint_list.append(hp.hint1)
-    hint_list.append(hp.hint2)
-    hint_list.append(hp.hint3)
-
-    armor.make_hypothesis(hint_list,'HP_0')
-    armor.reason()
-    print(armor.retrieve_class('HYPOTHESIS'))
+#    hint_list = []
+#    print('ready')
+#    hp = srv_client_get_hint_()
+#    print(hp)
+#    hint_list.append(hp.hint0)
+#    hint_list.append(hp.hint1)
+#    hint_list.append(hp.hint2)
+#
+#    armor.make_hypothesis(hint_list,'HP_0')
+#    armor.reason()
+#    print(armor.retrieve_class('HYPOTHESIS'))
+    hyp = []
+    n_hyp = 0
+    hypothesis_code = 'HP'+str(n_hyp)
     
-    
-    
+    for i in range(0,4):
+        person = random.choice(people_list)
+        weapon = random.choice(weapons_list)
+        place = random.choice(places_list)
+        plac = random.choice(places_list)
+        hyp = [person,weapon, place,plac]
+        print(hypothesis_code)
+        print(hyp)
+        armor.make_hypothesis(hyp, hypothesis_code)
+        armor.reason()
+#        print(armor.retrieve_class('HYPOTHESIS'))
+        print(armor.retrieve_class('COMPLETED'))
+        print(armor.retrieve_class('INCONSISTENT'))
+        #print(armor.details_of_an_hold_hypothesis(hypothesis_code))
+        n_hyp = n_hyp +1
+        hypothesis_code = 'HP'+str(n_hyp)
+        rospy.sleep(2)
     
     #srv_client_remove_discarded_()
 #    armor.add_dataPropriety('isSuspect','Scarlet','boolean','true')

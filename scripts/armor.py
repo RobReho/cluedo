@@ -98,47 +98,48 @@ class Armor_communication():
             
             
     def make_hypothesis(self,person,weapon,place,hyp_code):
-        try:
-            req=ArmorDirectiveReq()
-            req.client_name= 'cluedo'
-            req.reference_name= 'ontology'
-            req.command= 'ADD'
-            req.primary_command_spec= 'OBJECTPROP'
-            req.secondary_command_spec= 'IND'
-            req.args= ['who',hyp_code,person]
-            msg = self.armor_service(req)
+        if person:
+            try:
+                req=ArmorDirectiveReq()
+                req.client_name= 'cluedo'
+                req.reference_name= 'ontology'
+                req.command= 'ADD'
+                req.primary_command_spec= 'OBJECTPROP'
+                req.secondary_command_spec= 'IND'
+                req.args= ['who',hyp_code,person]
+                msg = self.armor_service(req)
+                
+            except rospy.ServiceException as e:
+                print(e)
             
-        except rospy.ServiceException as e:
-            print(e)
-            
-        try:
-            req=ArmorDirectiveReq()
-            req.client_name= 'cluedo'
-            req.reference_name= 'ontology'
-            req.command= 'ADD'
-            req.primary_command_spec= 'OBJECTPROP'
-            req.secondary_command_spec= 'IND'
-            req.args= ['what',hyp_code,weapon]
-            msg = self.armor_service(req)
-            
-        except rospy.ServiceException as e:
-            print(e)
+        if weapon:
+            try:
+                req=ArmorDirectiveReq()
+                req.client_name= 'cluedo'
+                req.reference_name= 'ontology'
+                req.command= 'ADD'
+                req.primary_command_spec= 'OBJECTPROP'
+                req.secondary_command_spec= 'IND'
+                req.args= ['what',hyp_code,weapon]
+                msg = self.armor_service(req)
+                
+            except rospy.ServiceException as e:
+                print(e)
 
+        if place:
+            try:
+                req=ArmorDirectiveReq()
+                req.client_name= 'cluedo'
+                req.reference_name= 'ontology'
+                req.command= 'ADD'
+                req.primary_command_spec= 'OBJECTPROP'
+                req.secondary_command_spec= 'IND'
+                req.args= ['where',hyp_code,place]
+                msg = self.armor_service(req)
+                
+            except rospy.ServiceException as e:
+                print(e)
 
-        try:
-            req=ArmorDirectiveReq()
-            req.client_name= 'cluedo'
-            req.reference_name= 'ontology'
-            req.command= 'ADD'
-            req.primary_command_spec= 'OBJECTPROP'
-            req.secondary_command_spec= 'IND'
-            req.args= ['where',hyp_code,place]
-            msg = self.armor_service(req)
-            
-        except rospy.ServiceException as e:
-            print(e)
-
-        self.reason()
     
     
         
@@ -200,13 +201,15 @@ def main():
     for i in range(0,4):
         person = random.choice(people_list)
         weapon = random.choice(weapons_list)
-        place = random.choice(places_list)
+        place = ''
+        print(hypothesis_code)
         print(person,weapon,place)
         armor.make_hypothesis(person, weapon, place, hypothesis_code)
-        print(armor.retrieve_class('HYPOTHESIS'))
+        armor.reason()
+#        print(armor.retrieve_class('HYPOTHESIS'))
         print(armor.retrieve_class('COMPLETED'))
         print(armor.retrieve_class('INCONSISTENT'))
-        print(armor.details_of_an_hold_hypothesis(hypothesis_code))
+        #print(armor.details_of_an_hold_hypothesis(hypothesis_code))
         n_hyp = n_hyp +1
         hypothesis_code = 'HP'+str(n_hyp)
         rospy.sleep(2)

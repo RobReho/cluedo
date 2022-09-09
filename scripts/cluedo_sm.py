@@ -11,22 +11,26 @@ import smach
 import smach_ros
 import random
 from std_msgs.msg import Int32
-from cluedo.srv import Compare, Hypothesis
 
 from armor_msgs.msg import * 
 from armor_msgs.srv import * 
-from cluedo.srv import Hypothesis, Discard
+from cluedo.srv import Hypothesis, Discard, Hints, Compare
 from os.path import dirname, realpath
 
 #place = ''
 #person = ''
 #weapon = ''
 #hp = [person,weapon,place]
+people_list = ["Scarlet","Plum","Green","White","Peacock","Mustard"]
+weapons_list = ["candlestik","rope","lead_pipe","revolver","spanner","dagger"]
+places_list = ["library","conservatory","lounge","ballroom","billiard_room","kitchen","dining_room","hall","study"]
 
 srv_client_query_source_ = rospy.ServiceProxy('/query_source', Compare)
 srv_client_final_hypothesis_ = rospy.ServiceProxy('/verify_solution', Compare)
 srv_client_generate_murder_ = rospy.ServiceProxy('/generate_murder', Hypothesis)  
+srv_client_get_hint_ = rospy.ServiceProxy('/get_hint', Hints)
 
+n_hyp = 0
 
 #------------------------ARMOR COMMUNICATION----------------------------------
 class Armor_communication():
@@ -113,34 +117,113 @@ class Armor_communication():
         except rospy.ServiceException as e:
             print(e)
             
-    def make_hypothesis(self,hyp):
+
+        
+#    def make_hypothesis(self,person,weapon,place,hyp_code):
+#        try:
+#            req=ArmorDirectiveReq()
+#            req.client_name= 'cluedo'
+#            req.reference_name= 'ontology'
+#            req.command= 'ADD'
+#            req.primary_command_spec= 'OBJECTPROP'
+#            req.secondary_command_spec= 'IND'
+#            req.args= ['who',hyp_code,person]
+#            msg = self.armor_service(req)
+#            
+#        except rospy.ServiceException as e:
+#            print(e)
+#            
+#        try:
+#            req=ArmorDirectiveReq()
+#            req.client_name= 'cluedo'
+#            req.reference_name= 'ontology'
+#            req.command= 'ADD'
+#            req.primary_command_spec= 'OBJECTPROP'
+#            req.secondary_command_spec= 'IND'
+#            req.args= ['what',hyp_code,weapon]
+#            msg = self.armor_service(req)
+#            
+#        except rospy.ServiceException as e:
+#            print(e)
+#
+#
+#        try:
+#            req=ArmorDirectiveReq()
+#            req.client_name= 'cluedo'
+#            req.reference_name= 'ontology'
+#            req.command= 'ADD'
+#            req.primary_command_spec= 'OBJECTPROP'
+#            req.secondary_command_spec= 'IND'
+#            req.args= ['where',hyp_code,place]
+#            msg = self.armor_service(req)
+#            
+#        except rospy.ServiceException as e:
+#            print(e)
+        
+        
+    def make_hypothesis(self,hyp,hypID):
         ##
         #\brief Insert an hypothesis in the system
         #@param hypothesis the hypothesis that will be inserted in the system, which is of type hypothesis
+        c = 0
+        # counts the hints in the hypothesis list
+        for i in range(len(hyp)):
+            if hyp[i]:
+                c = c+1
         
+        for i in range(c):
+            try:
+                req=ArmorDirectiveReq()
+                req.client_name= 'cluedo'
+                req.reference_name= 'ontology'
+                req.command= 'ADD'
+                req.primary_command_spec= 'OBJECTPROP'
+                req.secondary_command_spec= 'IND'  
+                if hyp[i] in people_list:
+                    req.args= ['who', hypID, hyp[i]]
+                elif hyp[i] in weapons_list:
+                    req.args= ['what', hypID, hyp[i]]
+                elif hyp[i] in places_list:
+                    req.args= ['where', hypID, hyp[i]]
+                msg = self.armor_service(req)
+                
+            except rospy.ServiceException as e:
+                print(e)
+    
+            try:
+                req=ArmorDirectiveReq()
+                req.client_name= 'cluedo'
+                req.reference_name= 'ontology'
+                req.command= 'ADD'
+                req.primary_command_spec= 'IND'
+                req.secondary_command_spec= 'CLASS'
+                if hyp[i] in people_list:
+                    req.args= [hyp[i],'PERSON']
+                elif hyp[i] in weapons_list:
+                    req.args= [hyp[i],'WEAPON']
+                elif hyp[i] in places_list:
+                    req.args= [hyp[i],'PLACE']
+                msg = self.armor_service(req)
+                
+            except rospy.ServiceException as e:
+                print(e)
+        print('done')
+                
+                
+                
 
+        
+    def details_of_an_hold_hypothesis(self,hypothesis_code):
         try:
             req=ArmorDirectiveReq()
             req.client_name= 'cluedo'
             req.reference_name= 'ontology'
-            req.command= 'ADD'
+            req.command= 'QUERY'
             req.primary_command_spec= 'OBJECTPROP'
             req.secondary_command_spec= 'IND'
-            req.args= ['who','HP',person]
+            req.args= ['who',hypothesis_code]
             msg = self.armor_service(req)
-            
-        except rospy.ServiceException as e:
-            print(e)
-
-        try:
-            req=ArmorDirectiveReq()
-            req.client_name= 'cluedo'
-            req.reference_name= 'ontology'
-            req.command= 'ADD'
-            req.primary_command_spec= 'IND'
-            req.secondary_command_spec= 'CLASS'
-            req.args= [person,'PERSON']
-            msg = self.armor_service(req)
+            print(msg.armor_response.queried_objects)
             
         except rospy.ServiceException as e:
             print(e)
@@ -149,25 +232,13 @@ class Armor_communication():
             req=ArmorDirectiveReq()
             req.client_name= 'cluedo'
             req.reference_name= 'ontology'
-            req.command= 'ADD'
+            req.command= 'QUERY'
             req.primary_command_spec= 'OBJECTPROP'
             req.secondary_command_spec= 'IND'
-            req.args= ['what','HP',weapon]
+            req.args= ['what',hypothesis_code]
             msg = self.armor_service(req)
-            
-        except rospy.ServiceException as e:
-            print(e)
+            print(msg.armor_response.queried_objects)
 
-        try:
-            req=ArmorDirectiveReq()
-            req.client_name= 'cluedo'
-            req.reference_name= 'ontology'
-            req.command= 'ADD'
-            req.primary_command_spec= 'IND'
-            req.secondary_command_spec= 'CLASS'
-            req.args= [weapon,'WEAPON']
-            msg = self.armor_service(req)
-            
         except rospy.ServiceException as e:
             print(e)
             
@@ -175,30 +246,18 @@ class Armor_communication():
             req=ArmorDirectiveReq()
             req.client_name= 'cluedo'
             req.reference_name= 'ontology'
-            req.command= 'ADD'
+            req.command= 'QUERY'
             req.primary_command_spec= 'OBJECTPROP'
             req.secondary_command_spec= 'IND'
-            req.args= ['where','HP',place]
+            req.args= ['where',hypothesis_code]
             msg = self.armor_service(req)
-            
-        except rospy.ServiceException as e:
-            print(e)
+            print(msg.armor_response.queried_objects)
 
-        try:
-            req=ArmorDirectiveReq()
-            req.client_name= 'cluedo'
-            req.reference_name= 'ontology'
-            req.command= 'ADD'
-            req.primary_command_spec= 'IND'
-            req.secondary_command_spec= 'CLASS'
-            req.args= [place,'PLACE']
-            msg = self.armor_service(req)
-            
         except rospy.ServiceException as e:
             print(e)
-        
-        
-        
+            
+            
+            
     def remove_instance(self,item,_class):
         try:
             req=ArmorDirectiveReq()
@@ -271,30 +330,46 @@ Check its consistency
 '''
 class Make_hypothesis(smach.State):
     def __init__(self):
-        smach.State.__init__(self, outcomes=['consistent','inconsistent','final hypothesis'],
-                                   input_keys=['person','weapon','place'],
-                                   output_keys=['person','weapon','place'])
+        smach.State.__init__(self, outcomes=['consistent','inconsistent','final hypothesis'])
 
     def execute(self, userdata):
+        global n_hyp
         rospy.loginfo('Executing state MAKE HYPOTHESIS')
-        pe_list = armor.retrieve_class('PERSON')
-        we_list = armor.retrieve_class('WEAPON')
         
-        if pe_list and we_list:
-            userdata.person = random.choice(pe_list)
-            userdata.weapon = random.choice(we_list)
-            armor.make_hypothesis(userdata.person, userdata.weapon, userdata.place)
-            armor.reason()
-            
-            if armor.retrieve_class('CONSISTENT') != 'Null':
-                if pe_list == 1 and we_list == 1 and armor.retrieve_class('PLACE') == 1 :
-                    # final hypothesis
-                    return 'final hypothesis'
-                else:
-                    print('Hypothesis: It was',userdata.person,'with the',userdata.weapon,'in the',userdata.place)
-                    return 'consistent'
-            else:
-                return 'inconsistent'
+        #debug
+        if armor.retrieve_class('COMPLETED'):
+            for i in range(len(armor.retrieve_class('COMPLETED'))):
+                print(armor.details_of_an_hold_hypothesis(armor.retrieve_class('COMPLETED')[i]))
+                
+        hyp = srv_client_get_hint_()
+        
+        hyp_list = [hyp.hint0,hyp.hint1,hyp.hint2,hyp.hint3]
+        print(hyp_list)
+#        userdata.person = hyp.hint0
+#        userdata.weapon = hyp.hint1
+#        userdata.place = hyp.hint2
+#        userdata.extra = hyp.hint3
+#        print(userdata.person, userdata.weapon, userdata.place, userdata.extra)
+        
+        hypothesis_code = 'HP'+str(n_hyp)
+        print(hypothesis_code)
+        armor.make_hypothesis(hyp_list, hypothesis_code)
+        print('made hp')
+        armor.reason()
+        print('reasoned')
+        compl = armor.retrieve_class('COMPLETED')
+        print(compl)
+        incons = armor.retrieve_class('INCONSISTENT')
+        print(incons)
+        
+#        if len(compl)==0 and len(incons)==0:
+#            print('Armor is not responding...quit program and restart')
+#            quit()
+        n_hyp = n_hyp +1
+        rospy.sleep(3)
+
+        if hypothesis_code in compl and hypothesis_code not in incons: 
+            return 'consistent' 
         else:
             return 'inconsistent'
         
@@ -318,23 +393,8 @@ class Query_source(smach.State):
         
         rospy.sleep(3)
         
-        resp = srv_client_query_source_(userdata.person, userdata.weapon, userdata.place)
-        if resp.person or resp.weapon or resp.place is True:
-            if resp.person is True:
-                armor.remove_instance(userdata.person,'PERSON')
-                armor.reason()
-                print(userdata.person,'is not a suspect--------------------------------------')
-                print(armor.retrieve_class('PERSON'))
-            if resp.weapon is True:
-                armor.remove_instance(userdata.weapon,'WEAPON')
-                armor.reason()
-                print(userdata.weapon,'is not the murder weapon------------------------------------')
-                print(armor.retrieve_class('WEAPON'))
-            if resp.place is True:
-                armor.remove_instance(userdata.place,'PLACE')
-                armor.reason()
-                print('The crime has not been committed in the',userdata.place,'-------------------')
-                print(armor.retrieve_class('PLACE'))
+        resp = srv_client_final_hypothesis_(userdata.person, userdata.weapon, userdata.place)
+        if resp.person and resp.weapon and resp.place is True:
         
             return 'succeded'
         else:
@@ -370,7 +430,7 @@ class Deliver_hypothesis(smach.State):
             print('Hypothesis: It was',userdata.person,'with the',userdata.weapon,'in the',userdata.place)
             return 'succeded'
         else:
-            print('Te hypothesis has failed to be delivered')
+            print('The hypothesis has failed to be delivered')
             return 'failed'
         
 
@@ -416,8 +476,8 @@ def main():
                                             'final hypothesis':'GO TO ORACLE'})
         
         smach.StateMachine.add('QUERY SOURCE', Query_source(),
-                               transitions={'succeded':'EXPLORE',
-                                            'failed':'QUERY SOURCE'})
+                               transitions={'succeded':'GO TO ORACLE',
+                                            'failed':'EXPLORE'})
 
         # Create the sub SMACH state machine
 #        mkhy_sub = smach.StateMachine(outcomes=['out1','out2'])

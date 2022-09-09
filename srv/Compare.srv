@@ -1,0 +1,7 @@
+string person
+string weapon
+string place
+---
+bool person
+bool weapon
+bool place

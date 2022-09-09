@@ -2,12 +2,19 @@
 import random
 import time
 import rospy
-from cluedo.srv import Hints, Discard
+from cluedo.srv import Hints, Discard, Hypothesis, Compare
+from std_msgs.msg import Bool
+
 
 people_list = ["Scarlet","Plum","Green","White","Peacock","Mustard"]
 weapons_list = ["candlestik","rope","lead_pipe","revolver","spanner","dagger"]
 places_list = ["library","conservatory","lounge","ballroom","billiard_room","kitchen","dining_room","hall","study"]
-hints = people_list + weapons_list + places_list
+all_hints = people_list + weapons_list + places_list
+# Murder
+who = ""
+what = ""
+where = ""
+
 
 class Hint:
     def __init__(self):
@@ -18,9 +25,29 @@ class Hint:
         self.hint1 = ""
         self.hint2 = ""
         self.hint3 = ""
-        
-        
-def consistent_hypothesis():
+
+def gen_murder(req):
+    global who, what, where
+    
+    if len(people_list):
+      who = random.choice(people_list)
+      people_list.remove(who)
+      
+    if len(weapons_list):
+      what = random.choice(weapons_list)
+      weapons_list.remove(what)
+      
+    if len(places_list):
+      where = random.choice(places_list)
+      places_list.remove(where)
+      
+    print("A murder is announced!")
+    print(who,what,where)
+    
+    return who, what, where
+
+
+def __consistent_hypothesis():
     hint = Hint()
     if len(people_list):
         hint.hint0 = random.choice(people_list)
@@ -28,27 +55,37 @@ def consistent_hypothesis():
         hint.hint1 = random.choice(weapons_list)
     if len(people_list):
         hint.hint2 = random.choice(places_list)
-#    hyp.append(person)
-#    hyp.append(weapon)
-#    hyp.append(place)
+
     return hint
     
 
-def inconsistent_hypothesis():
+def __inconsistent_hypothesis():
     hint = Hint()
-    range_ = random.randint(1,4)
-    print(range_)
+    range_ = random.randint(2,4)
     for i in range(range_):
         if i == 0:
-            hint.hint0 = random.choice(hints)
+            hint.hint0 = random.choice(people_list)
         elif i == 1:
-            hint.hint1 = random.choice(hints)
+            hint.hint1 = random.choice(weapons_list)
         elif i == 2:
-            hint.hint2 = random.choice(hints)
+            hint.hint2 = random.choice(places_list)
         elif i == 3:
-            hint.hint3 = random.choice(hints)
+            hint.hint3 = random.choice(all_hints)
+            
     return hint
         
+
+def give_hint(self):
+    rand = random.randint(0,1)
+    if rand == 0:
+        hint = __consistent_hypothesis()
+        print('CONSISTENT:', hint.hint0, hint.hint1, hint.hint2, hint.hint3)
+    else:
+        hint = __inconsistent_hypothesis()
+        print('INCONSISTENT:', hint.hint0, hint.hint1, hint.hint2, hint.hint3)
+    
+    return hint.hint0, hint.hint1, hint.hint2, hint.hint3
+
 
 def remove_discarded(item):
     global people_list, weapons_list, places_list, hints
@@ -67,23 +104,34 @@ def remove_discarded(item):
     
     return[]
     
-    
-def give_hint(self):
-    rand = random.randint(0,1)
-    hint = []
-    if rand == 0:
-        hint = consistent_hypothesis()
-    else:
-        hint = inconsistent_hypothesis()
-    
-    return hint.hint0, hint.hint1, hint.hint2, hint.hint3
             
-            
+
+def verify_solution(req):
+    global who, what, where
+    print('------------verify solution --------------')
+    print(req.person, req.weapon, req.place)
+    same_person = False
+    same_weapon = False
+    same_place = False
+    print(same_person, same_weapon, same_place)
+    if req.person == who:
+        same_person = True
+    if req.weapon == what:
+        same_weapon = True
+    if req.place == where:
+        same_place = True
+        
+    return same_person,same_weapon,same_place
+          
+  
 def main():
     rospy.init_node('oracle')
 
     rospy.Service('get_hint', Hints, give_hint)
     rospy.Service('remove_hypothesis', Discard, remove_discarded)
+    rospy.Service('generate_murder',  Hypothesis, gen_murder)
+    rospy.Service('verify_solution', Compare, verify_solution)
+
 
     print('ready')
 
