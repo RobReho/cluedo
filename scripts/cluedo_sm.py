@@ -330,26 +330,24 @@ Check its consistency
 '''
 class Make_hypothesis(smach.State):
     def __init__(self):
-        smach.State.__init__(self, outcomes=['consistent','inconsistent','final hypothesis'])
+        smach.State.__init__(self, outcomes=['consistent','inconsistent','final hypothesis'],
+                                    input_keys=['person','weapon','place'],
+                                    output_keys=['person','weapon','place'])
 
     def execute(self, userdata):
         global n_hyp
         rospy.loginfo('Executing state MAKE HYPOTHESIS')
         
         #debug
-        if armor.retrieve_class('COMPLETED'):
-            for i in range(len(armor.retrieve_class('COMPLETED'))):
-                print(armor.details_of_an_hold_hypothesis(armor.retrieve_class('COMPLETED')[i]))
+#        if armor.retrieve_class('COMPLETED'):
+#            for i in range(len(armor.retrieve_class('COMPLETED'))):
+#                print(armor.details_of_an_hold_hypothesis(armor.retrieve_class('COMPLETED')[i]))
                 
         hyp = srv_client_get_hint_()
         
         hyp_list = [hyp.hint0,hyp.hint1,hyp.hint2,hyp.hint3]
         print(hyp_list)
-#        userdata.person = hyp.hint0
-#        userdata.weapon = hyp.hint1
-#        userdata.place = hyp.hint2
-#        userdata.extra = hyp.hint3
-#        print(userdata.person, userdata.weapon, userdata.place, userdata.extra)
+#        
         
         hypothesis_code = 'HP'+str(n_hyp)
         print(hypothesis_code)
@@ -369,6 +367,9 @@ class Make_hypothesis(smach.State):
         rospy.sleep(3)
 
         if hypothesis_code in compl and hypothesis_code not in incons: 
+            userdata.person = hyp.hint0
+            userdata.weapon = hyp.hint1
+            userdata.place = hyp.hint2
             return 'consistent' 
         else:
             return 'inconsistent'

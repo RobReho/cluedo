@@ -31,18 +31,16 @@ def gen_murder(req):
     
     if len(people_list):
       who = random.choice(people_list)
-      people_list.remove(who)
       
     if len(weapons_list):
       what = random.choice(weapons_list)
-      weapons_list.remove(what)
       
     if len(places_list):
       where = random.choice(places_list)
-      places_list.remove(where)
       
     print("A murder is announced!")
     print(who,what,where)
+   
     
     return who, what, where
 
@@ -113,14 +111,14 @@ def verify_solution(req):
     same_person = False
     same_weapon = False
     same_place = False
-    print(same_person, same_weapon, same_place)
     if req.person == who:
         same_person = True
     if req.weapon == what:
         same_weapon = True
     if req.place == where:
         same_place = True
-        
+    print(same_person, same_weapon, same_place)
+    
     return same_person,same_weapon,same_place
           
   
@@ -132,26 +130,8 @@ def main():
     rospy.Service('generate_murder',  Hypothesis, gen_murder)
     rospy.Service('verify_solution', Compare, verify_solution)
 
-
     print('ready')
 
-#    while 1:
-#        hint = consistent_hypothesis()
-#        print(hint.hint0, hint.hint1, hint.hint2, hint.hint3)
-#        
-#        inc_hint = inconsistent_hypothesis()
-#        print(inc_hint.hint0, inc_hint.hint1, inc_hint.hint2, inc_hint.hint3)
-#    print(people_list)
-#    print(weapons_list)
-#    print(places_list)
-#    print(hints)
-#    time.sleep(2)
-#    remove_discarded('Scarlet')
-#    time.sleep(2)
-#    remove_discarded('hall')
-#    time.sleep(2)
-#    remove_discarded('dagger')
-    
     rate = rospy.Rate(20)
     while not rospy.is_shutdown():
         rate.sleep()
