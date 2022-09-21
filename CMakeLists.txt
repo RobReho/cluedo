@@ -57,7 +57,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate services in the 'srv' folder
  add_service_files(
    FILES
-    Hypothesis.srv
+    Murder.srv
     Discard.srv
     Compare.srv
     Hints.srv
@@ -166,8 +166,9 @@ include_directories(
    scripts/server.py  
    scripts/armor_functions.py  
    scripts/cluedo_sm.py  
-   scripts/test.py
+   scripts/hint_server.py
    scripts/armor.py
+   scripts/user_interface.py
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
  )
 
