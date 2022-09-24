@@ -1,7 +1,8 @@
-# exproblab
-Assignments for the Experimental Robotic Lab course a.y.2021/2022
+# Experimental robotic lab
+First assignment for the Experimental Robotic Lab course a.y.2021/2022
 
 ## Introduction
+Brief introduction (couple of sentences).
 
 ## Software architecture
 temporal diagram and states diagrams (if
@@ -9,6 +10,7 @@ applicable). Each diagram should be commented with a paragraph,
 plus a list describing ROS messages and parameters.
 
 ## Installation and Running
+(including all the steps to display the robot’s behavior).
 
 ## Demo
 A commented small video, a GIF or screenshots showing the relevant
