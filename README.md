@@ -14,8 +14,9 @@ plus a list describing ROS messages and parameters.
 
 ## Demo
 A commented small video, a GIF or screenshots showing the relevant
-parts of the running code.
-![Alt Text]([https://media.giphy.com/media/vFKqnCdLPNOKc/giphy.gif](https://github.com/RobReho/exproblab/blob/main/media/State_machine.gif))
+parts of the running code.  
+
+![Alt Text](https://github.com/RobReho/exproblab/blob/main/media/State_machine.gif)
 
 ## Working hypothesis and environment (1 or 2 paragraph).
 1. System�s features (1 or 2 paragraph).
