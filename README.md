@@ -2,7 +2,7 @@
 First assignment for the Experimental Robotic Lab course a.y.2021/2022
 
 ## Introduction
-Brief introduction (couple of sentences).
+At this stage of the project the robot is a point that aims at exploring its environment and deducing hypotheses based on hints it finds in different rooms. The robot has been designed to move randomly through the environment, entering different rooms and looking around for hints to make hypotheses. If a consistent hypothesis can be deduced, the robot will go to a designated location and express it in English. If the hypothesis is incorrect, the robot will continue exploring and finding new hints until a correct hypothesis is deduced.
 
 ## Software architecture
 temporal diagram and states diagrams (if
@@ -15,6 +15,7 @@ plus a list describing ROS messages and parameters.
 ## Demo
 A commented small video, a GIF or screenshots showing the relevant
 parts of the running code.
+![Alt Text](https://media.giphy.com/media/vFKqnCdLPNOKc/giphy.gif)
 
 ## Working hypothesis and environment (1 or 2 paragraph).
 1. System�s features (1 or 2 paragraph).
