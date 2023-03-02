@@ -1,35 +1,45 @@
 #!/usr/bin/env python3
 """@package cluedo state machine
 This node handles the states of the FSM
+The states are implemented in the "cluedo_state_machine" node.
+- The INIT state Establish the communication with Armor server, loads OWL file, calls "generate murder" service to start the game, retrieves people, weapons and places list from the OWL 
+- The EXPLORE state retrieves the list of available places, randomly choose one and simulates reaching the place by sleeping 1 second.
+- THe MAKE HYPOTHESIS state asks the server to get a new hint, it loads it on the ontology and retrieves the classes "COMPLETE" and "INCONISTENT" to check for consistency. If the hypothesis is consistent the executed state is REACH ORACLE, otherwise it will go back to the state EXPLORE.
+- The state REACH ORACLE just simulates reaching the oracle posistion by sleeping 1 second. The possibility that this state fails is implemented in the state machine, but never executed. The possibility is left for future implementations where an actual sction will be implemented. Onche the oracle is reached, the next executed state is DELIVER HYPOTHESIS.
+- The DELIVER HYPOTHESIS state gets the person, weapon and place of the hypothesis and express it in natural language. The next state is HYPOTHESIS CHECK
+- The state HYPOTHESIS CHECK calls the server "verify solution" to compare the hypothesis with the right one. If all the booleans returned are true the game ends, otherwise the hypothesis is wrong and the program executes the state EXPLORE.
 
-smach viewer:
-    rosrun smach_viewer smach_viewer.py
-    
-armore server:
-    rosrun armor execute it.emarolab.armor.ARMORMainService
+The nodes communicate with some customized services:
+- "/verify_solution" of type Compare
+- '/generate_murder' of type Hypothesis
+- '/get_hint' of type Hints
+
 """
 import rospy
 import smach
 import smach_ros
 import random
-from std_msgs.msg import Int32, String
+from std_msgs.msg import String
 
 from armor_msgs.msg import * 
 from armor_msgs.srv import * 
-from cluedo.srv import Hypothesis, Discard, Hints, Compare
+from cluedo.srv import Hypothesis, Hints, Compare
 from os.path import dirname, realpath
 
-# lists of peolpe, weapons and places to be retrieved from Armor server
+# lists of people, weapons and places to be retrieved from Armor server
 people_list = []
 weapons_list = []
 places_list = []
 
-srv_client_query_source_ = rospy.ServiceProxy('/query_source', Compare)
+# service client to compare the hypothesis with the right solution
 srv_client_final_hypothesis_ = rospy.ServiceProxy('/verify_solution', Compare)
+# service client to generate the winning hypothesis
 srv_client_generate_murder_ = rospy.ServiceProxy('/generate_murder', Hypothesis)  
+# service client to ask for a hint
 srv_client_get_hint_ = rospy.ServiceProxy('/get_hint', Hints)
+
 ui = rospy.Publisher('ui_output', String, queue_size=30)    # user interface publisher
-n_hyp = 0
+n_hyp = 0 # number of hypothesis
 
 #------------------------ARMOR COMMUNICATION----------------------------------
 class Armor_communication():
@@ -182,72 +192,11 @@ class Armor_communication():
         print('done')
                 
                 
-                
-
-        
-#    def details_of_an_hold_hypothesis(self,hypothesis_code):
-#        
-#        try:
-#            req=ArmorDirectiveReq()
-#            req.client_name= 'cluedo'
-#            req.reference_name= 'ontology'
-#            req.command= 'QUERY'
-#            req.primary_command_spec= 'OBJECTPROP'
-#            req.secondary_command_spec= 'IND'
-#            req.args= ['who',hypothesis_code]
-#            msg = self.armor_service(req)
-#            print(msg.armor_response.queried_objects)
-#            
-#        except rospy.ServiceException as e:
-#            print(e)
-#            
-#        try:
-#            req=ArmorDirectiveReq()
-#            req.client_name= 'cluedo'
-#            req.reference_name= 'ontology'
-#            req.command= 'QUERY'
-#            req.primary_command_spec= 'OBJECTPROP'
-#            req.secondary_command_spec= 'IND'
-#            req.args= ['what',hypothesis_code]
-#            msg = self.armor_service(req)
-#            print(msg.armor_response.queried_objects)
-#
-#        except rospy.ServiceException as e:
-#            print(e)
-#            
-#        try:
-#            req=ArmorDirectiveReq()
-#            req.client_name= 'cluedo'
-#            req.reference_name= 'ontology'
-#            req.command= 'QUERY'
-#            req.primary_command_spec= 'OBJECTPROP'
-#            req.secondary_command_spec= 'IND'
-#            req.args= ['where',hypothesis_code]
-#            msg = self.armor_service(req)
-#            print(msg.armor_response.queried_objects)
-#
-#        except rospy.ServiceException as e:
-#            print(e)
-#            
-#            
-#            
-#    def remove_instance(self,item,_class):
-#        try:
-#            req=ArmorDirectiveReq()
-#            req.client_name= 'cluedo'
-#            req.reference_name= 'ontology'
-#            req.command= 'REMOVE'
-#            req.primary_command_spec= 'IND'
-#            req.secondary_command_spec= 'CLASS'
-#            req.args= [item,_class]
-#            msg = self.armor_service(req)
-#            
-#        except rospy.ServiceException as e:
-#            print(e)
-            
-
 armor = Armor_communication()
-
+"""
+\brief Handles debugging msgs and publishes UI output
+@param String message
+"""
 def ui_message(message):
     rospy.loginfo(message)
     ui.publish(rospy.get_caller_id() + ':   ' + message)
@@ -280,6 +229,7 @@ class Initialization(smach.State):
         rospy.wait_for_service("generate_murder") 
         srv_client_generate_murder_()
         ui_message('Initializing game:')
+        rospy.sleep(20)
         if people_list and weapons_list and places_list:
             ui_message('Detective ready')
             return 'ready'
@@ -301,11 +251,12 @@ class Explore(smach.State):
     def execute(self, userdata):
         global places_list
         ui_message('EXPLORING')
-    
+
+        # choose a random place to explore
         if places_list:
             place = random.choice(places_list)
-            ui_message('I am going to the' + place)
-            rospy.sleep(3)  # Reach place
+            ui_message('I am going to the... ' + place)
+            rospy.sleep(1)  # Reach place simulation
             return 'found_source'
         else:
             rospy.logerr('places list failed to load')
@@ -315,11 +266,9 @@ class Explore(smach.State):
 
 '''
 # define state CHECK CONSISTENCY
-Retrieve people and weapons
-Choose random person an weapon
+Asks a new hint to the /get_hint server
 Make a new hypothesis
 Check its consistency
-(if inconsistent, delete and make another)
 '''
 class Make_hypothesis(smach.State):
     def __init__(self):
@@ -330,23 +279,20 @@ class Make_hypothesis(smach.State):
     def execute(self, userdata):
         global n_hyp
         ui_message('MAKING AN HYPOTHESIS:')
-        # debug
-#        if armor.retrieve_class('COMPLETED'):
-#            for i in range(len(armor.retrieve_class('COMPLETED'))):
-#                print(armor.details_of_an_hold_hypothesis(armor.retrieve_class('COMPLETED')[i]))
+        
                 
         hyp = srv_client_get_hint_()    # receive hint from hints server    
         hyp_list = [hyp.hint0,hyp.hint1,hyp.hint2,hyp.hint3]
             
         hypothesis_code = 'HP'+str(n_hyp)   # progressive number of hypothesis
-#        print(hypothesis_code)
         armor.make_hypothesis(hyp_list, hypothesis_code)
         armor.reason()
+        # retieve elements of classes COMPLETED and INCONSISTENT
         compl = armor.retrieve_class('COMPLETED')
         incons = armor.retrieve_class('INCONSISTENT')        
 
         n_hyp = n_hyp +1
-        rospy.sleep(3)
+        rospy.sleep(1)
 
         if hypothesis_code in compl and hypothesis_code not in incons: 
             userdata.person = hyp.hint0
@@ -373,14 +319,16 @@ class Reach_oracle(smach.State):
 
     def execute(self, userdata):
         ui_message('REACHING ORACLE')
-        rospy.sleep(3)  # reaching the oracle
+        rospy.sleep(1)  # reaching the oracle
         
         return 'reached'
-    # return 'failed' # to be implemented in further iteration
+         # return 'failed' # to be implemented in further iteration
         
     
-        
+'''
 # define state DELIVER HYPOTHESIS
+formulate consistent hypothesis in natural language
+'''
 class Deliver_hypothesis(smach.State):
     def __init__(self):
         smach.State.__init__(self, outcomes=['failed','succeded'],
@@ -389,7 +337,8 @@ class Deliver_hypothesis(smach.State):
 
     def execute(self, userdata):
         ui_message('DELIVERING HYPOTHESIS')
-        ui.publish(rospy.get_caller_id() +'Executing state DELIVER HYPOTHESIS')
+        rospy.sleep(1)
+        #ui.publish(rospy.get_caller_id() +'Executing state DELIVER HYPOTHESIS')
         if userdata.person and userdata.weapon and userdata.place:
             ui_message('Hypothesis: It was ' + userdata.person + ' with the ' + userdata.weapon +' in the ' + userdata.place)
             return 'succeded'
@@ -397,8 +346,10 @@ class Deliver_hypothesis(smach.State):
             ui_message('The hypothesis has failed to be delivered')
             return 'failed'
         
-
+'''
 # define state HYPOTHESIS CHECK 
+call the server of sevice /verify_solution to compare the stored hypothesis with the right one
+'''
 class Hypothesis_check(smach.State):
     def __init__(self):
         smach.State.__init__(self, outcomes=['right','wrong'],
@@ -406,7 +357,7 @@ class Hypothesis_check(smach.State):
 
     def execute(self, userdata):
         ui_message('CHECKING HYPOTHESIS')
-        rospy.sleep(3)
+        rospy.sleep(1)
         resp = srv_client_final_hypothesis_(userdata.person, userdata.weapon, userdata.place)
         
         if resp.person and resp.weapon and resp.place is True:

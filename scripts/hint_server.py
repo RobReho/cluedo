@@ -2,14 +2,14 @@
 """@package hint_server
 This node stores the solution of the game,
 generates hints to give to the player
-and handles the incoming hypothesis
+and handles the incoming hypothesis by comparing them
+withe the stored solution.
 
 """
 import random
-import time
 import rospy
-from cluedo.srv import Hints, Discard, Hypothesis, Compare
-from std_msgs.msg import Bool, String
+from cluedo.srv import Hints, Hypothesis, Compare
+from std_msgs.msg import String
 
 
 people_list = ["Scarlet","Plum","Green","White","Peacock","Mustard"]
@@ -34,6 +34,14 @@ class Hint:
         self.hint3 = ""
 
 
+def ui_message(message):
+    """
+    \brief Handles debugging msgs and publishes UI output
+    @param String message
+    """
+    rospy.loginfo(message)
+    ui.publish(rospy.get_caller_id() + ':                 ' + message)
+    
 
 def gen_murder(req):
     ''' \brief Initialize the game by randomly generating a murderer, weapon and place
@@ -57,9 +65,8 @@ def gen_murder(req):
     if len(places_list):
       where = random.choice(places_list)
       
-    print("A murder is announced!")
+    ui_message("A murder is announced!")
     print(who,what,where)
-    ui.publish(rospy.get_caller_id() +"A murder is announced!")
     
     return who, what, where
 
@@ -117,7 +124,7 @@ def give_hint(self):
     
     @return array of hints
 '''
-    ui.publish("Here's a hint...")
+    ui_message("Here's a hint...")
     rand = random.randint(0,1)
     if rand == 0:
         hint = __consistent_hypothesis()
@@ -128,24 +135,6 @@ def give_hint(self):
     
     return hint.hint0, hint.hint1, hint.hint2, hint.hint3
 
-
-#def remove_discarded(item):
-#    global people_list, weapons_list, places_list, hints
-#    
-#    if item in people_list:
-#        people_list = [item]
-#        print(people_list)
-#    elif item in weapons_list:
-#        weapons_list = [item]
-#        print(weapons_list)
-#    elif item in places_list:
-#        places_list = [item]
-#        print(places_list)
-#    hints = people_list + weapons_list + places_list
-#    print(hints)
-#    
-#    return[]
-    
             
 
 def verify_solution(req):
@@ -162,18 +151,27 @@ def verify_solution(req):
     @param[in] req: string person, string weapon, string place
     @return bool: true if the the elements are the same
 '''
-    global who, what, where
-    ui.publish(rospy.get_caller_id() +"Let's verify this hypothesis")
+    global who, what, where, people_list, weapons_list, places_list
+    ui_message("Let's verify this hypothesis")
     print(req.person, req.weapon, req.place)
     same_person = False
     same_weapon = False
     same_place = False
     if req.person == who:
         same_person = True
+    else:
+        people_list.remove(req.person)
+        
     if req.weapon == what:
         same_weapon = True
+    else:
+        weapons_list.remove(req.weapon)
+        
     if req.place == where:
         same_place = True
+    else:
+        places_list.remove(req.place)
+        
     print(same_person, same_weapon, same_place)
     
     return same_person,same_weapon,same_place
@@ -182,9 +180,11 @@ def verify_solution(req):
 def main():
     rospy.init_node('oracle')
 
+    # service server to give a hint
     rospy.Service('get_hint', Hints, give_hint)
-    #rospy.Service('remove_hypothesis', Discard, remove_discarded)
+    # service server to generate the right hypothesis
     rospy.Service('generate_murder',  Hypothesis, gen_murder)
+    # service server to compare an hypothesis with the right one
     rospy.Service('verify_solution', Compare, verify_solution)
 
     print('ready')

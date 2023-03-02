@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<launch>
+  	<node pkg="armor" type="execute" name="armor_service" args="it.emarolab.armor.ARMORMainService" />
+  	<node name="oracle" pkg="cluedo" type="hint_server.py" respawn="false" ></node>
+  	<node name="cluedo_state_machine" pkg="cluedo" type="cluedo_sm.py" respawn="false" ></node>
+  	<node name="user_interface" pkg="cluedo" type="user_interface.py" respawn="false" output="screen"></node>
+
+    <!--launch-prefix="terminator -x python" output="screen"-->
+</launch>
