@@ -40,30 +40,30 @@ The states are implemented in the "cluedo_state_machine" node.
 ## Installation and Running
 This project needs some external packages. You can install them in your ROS workspace:  
 ARMOR
-'''
+```
   git clone https://github.com/EmaroLab/armor.git
-'''
+```
 SMASH
-'''
+```
   git clone https://github.com/ros/executive_smach.git
   git clone https://github.com/ros-visualization/executive_smach_visualization.git
-'''
+```
 To install the package clone the repository in your ROS workspace:
-'''
+```
   git clone https://github.com/RobReho/exproblab.git
-'''
+```
 then build your ROS workspace:
-'''
+```
   catkin_make
- '''
+```
 To run the project launch the mani launch file:
-'''
+```
   roslaunch cluedo launcher.launch
-'''
+```
 To visualize the Smash state machine graph, run in another tab:
-'''
+```
   rosrun smach_viewer smach_viewer.py
-'''
+```
 
 ## Demo
 
@@ -71,9 +71,14 @@ To visualize the Smash state machine graph, run in another tab:
 
 ## Working hypothesis and environment.
 ### System features
-The game
-2. System limitations (1 or 2 paragraph).
-3. Possible technical Improvements (1 or 2 paragraph).
+The game is a revisited simulated Cluedo game, where the player is the robot implemented by the state machine, and the game is controlled by the Oracle. The oracle gnerates the hypothesis by choosing random elements in the people, weapons and places arrays. Randomly, it might generate and inconsistent hypothesis, meaning that it will be composed by 4 elements instead of 3.
+The robot will get both consistent and inconsistent hipothesis and send bach only the consistent hypothesis to be compared with the solution. When an hypothesis is compared to the solution the hints that don't match are deiscarded from the hints arrays stored in the oracle node. As more hypothesis are compared it is more and more likely that the hypothesis proposed matches the solution.
+![Alt Text](https://github.com/RobReho/exproblab/blob/main/media/erl1_end.PNG)
+
+### System limitations 
+The game implemented has a very simple structure and does not use the any IDs associated with the hypothesis. The architecture of the game has a very different way to generate and handle hypothesis with respect to the following iterations. Nevertheless, the semplicity of the architecture makes it easy to adapt to futures implementations.
+### Possible technical Improvements
+Possible improvement are a system that generates hints in a similar way to what happens in the following iterations.
 
 ## Contacts
 Roberta Reho: s5075214@studenti.unige.it
