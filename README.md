@@ -5,9 +5,9 @@ First assignment for the Experimental Robotic Lab course a.y.2021/2022
 At this stage of the project the robot is a point that aims at exploring its environment and deducing hypotheses based on hints it finds in different rooms. The robot has been designed to move randomly through the environment, entering different rooms and looking around for hints to make hypotheses. If a consistent hypothesis can be deduced, the robot will go to a designated location and express it in English. If the hypothesis is incorrect, the robot will continue exploring and finding new hints until a correct hypothesis is deduced.
 
 ## Software architecture
-![Alt Text](https://github.com/RobReho/exproblab/blob/main/media/erl1_temp.png)  
+![Alt Text](https://github.com/RobReho/exproblab/blob/main/media/erl1_temp.PNG)  
 
-![Alt Text](https://github.com/RobReho/exproblab/blob/main/media/sm1.png)
+![Alt Text](https://github.com/RobReho/exproblab/blob/main/media/sm1.PNG)
 
 temporal diagram and states diagrams (if
 applicable). Each diagram should be commented with a paragraph,
