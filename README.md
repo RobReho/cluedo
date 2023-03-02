@@ -10,7 +10,32 @@ applicable). Each diagram should be commented with a paragraph,
 plus a list describing ROS messages and parameters.
 
 ## Installation and Running
-(including all the steps to display the robot’s behavior).
+This project needs some external packages. You can install them in your ROS workspace:  
+ARMOR
+'''
+  git clone https://github.com/EmaroLab/armor.git
+'''
+SMASH
+'''
+  git clone https://github.com/ros/executive_smach.git
+  git clone https://github.com/ros-visualization/executive_smach_visualization.git
+'''
+To install the package clone the repository in your ROS workspace:
+'''
+  git clone https://github.com/RobReho/exproblab.git
+'''
+then build your ROS workspace:
+'''
+  catkin_make
+ '''
+To run the project launch the mani launch file:
+'''
+  roslaunch cluedo launcher.launch
+'''
+To visualize the Smash state machine graph, run in another tab:
+'''
+  rosrun smach_viewer smach_viewer.py
+'''
 
 ## Demo
 A commented small video, a GIF or screenshots showing the relevant
