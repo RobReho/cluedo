@@ -1,0 +1,76 @@
+\hypertarget{namespacecluedo__sm}{}\doxysection{cluedo\+\_\+sm Namespace Reference}
+\label{namespacecluedo__sm}\index{cluedo\_sm@{cluedo\_sm}}
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classcluedo__sm_1_1_armor__communication}{Armor\+\_\+communication}}
+\item 
+class \mbox{\hyperlink{classcluedo__sm_1_1_deliver__hypothesis}{Deliver\+\_\+hypothesis}}
+\item 
+class \mbox{\hyperlink{classcluedo__sm_1_1_explore}{Explore}}
+\item 
+class \mbox{\hyperlink{classcluedo__sm_1_1_hypothesis__check}{Hypothesis\+\_\+check}}
+\item 
+class \mbox{\hyperlink{classcluedo__sm_1_1_initialization}{Initialization}}
+\item 
+class \mbox{\hyperlink{classcluedo__sm_1_1_make__hypothesis}{Make\+\_\+hypothesis}}
+\item 
+class \mbox{\hyperlink{classcluedo__sm_1_1_reach__oracle}{Reach\+\_\+oracle}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{namespacecluedo__sm_af2e7c49af5eb1b7f8751d90ca89e2521}\label{namespacecluedo__sm_af2e7c49af5eb1b7f8751d90ca89e2521}} 
+def {\bfseries ui\+\_\+message} (message)
+\item 
+\mbox{\Hypertarget{namespacecluedo__sm_adbc1f520e821ff1a8342de513efb21ed}\label{namespacecluedo__sm_adbc1f520e821ff1a8342de513efb21ed}} 
+def {\bfseries main} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{namespacecluedo__sm_ab47ab0f6c84f449456e21f783c57e188}\label{namespacecluedo__sm_ab47ab0f6c84f449456e21f783c57e188}} 
+list {\bfseries people\+\_\+list} = \mbox{[}$\,$\mbox{]}
+\item 
+\mbox{\Hypertarget{namespacecluedo__sm_afbb3e1685ae5e18b9ee4a8f9a8ba1c29}\label{namespacecluedo__sm_afbb3e1685ae5e18b9ee4a8f9a8ba1c29}} 
+list {\bfseries weapons\+\_\+list} = \mbox{[}$\,$\mbox{]}
+\item 
+\mbox{\Hypertarget{namespacecluedo__sm_a772f3db6a9f6e4cb52869813a3fee376}\label{namespacecluedo__sm_a772f3db6a9f6e4cb52869813a3fee376}} 
+list {\bfseries places\+\_\+list} = \mbox{[}$\,$\mbox{]}
+\item 
+\mbox{\Hypertarget{namespacecluedo__sm_aca12666260098934dad99ac3e45e432e}\label{namespacecluedo__sm_aca12666260098934dad99ac3e45e432e}} 
+{\bfseries srv\+\_\+client\+\_\+final\+\_\+hypothesis\+\_\+} = rospy.\+Service\+Proxy(\textquotesingle{}/verify\+\_\+solution\textquotesingle{}, Compare)
+\item 
+\mbox{\Hypertarget{namespacecluedo__sm_aef10ace17d3f33dff9829ca164612ecf}\label{namespacecluedo__sm_aef10ace17d3f33dff9829ca164612ecf}} 
+{\bfseries srv\+\_\+client\+\_\+generate\+\_\+murder\+\_\+} = rospy.\+Service\+Proxy(\textquotesingle{}/generate\+\_\+murder\textquotesingle{}, Hypothesis)
+\item 
+\mbox{\Hypertarget{namespacecluedo__sm_aa7e435cc3a84a68842507f567047971a}\label{namespacecluedo__sm_aa7e435cc3a84a68842507f567047971a}} 
+{\bfseries srv\+\_\+client\+\_\+get\+\_\+hint\+\_\+} = rospy.\+Service\+Proxy(\textquotesingle{}/get\+\_\+hint\textquotesingle{}, Hints)
+\item 
+\mbox{\Hypertarget{namespacecluedo__sm_ade7964499965af53d7cd6f775c0d959e}\label{namespacecluedo__sm_ade7964499965af53d7cd6f775c0d959e}} 
+{\bfseries ui} = rospy.\+Publisher(\textquotesingle{}ui\+\_\+output\textquotesingle{}, String, queue\+\_\+size=30)
+\item 
+\mbox{\Hypertarget{namespacecluedo__sm_afdf6c4470eb33b636df22b6c280859d3}\label{namespacecluedo__sm_afdf6c4470eb33b636df22b6c280859d3}} 
+int {\bfseries n\+\_\+hyp} = 0
+\item 
+\mbox{\Hypertarget{namespacecluedo__sm_aca9afbdbd20dae05b99f4749ba8ac611}\label{namespacecluedo__sm_aca9afbdbd20dae05b99f4749ba8ac611}} 
+{\bfseries armor} = \mbox{\hyperlink{classcluedo__sm_1_1_armor__communication}{Armor\+\_\+communication}}()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyVerb}@package cluedo state machine
+This node handles the states of the FSM
+The states are implemented in the "cluedo_state_machine" node.
+- The INIT state Establish the communication with Armor server, loads OWL file, calls "generate murder" service to start the game, retrieves people, weapons and places list from the OWL 
+- The EXPLORE state retrieves the list of available places, randomly choose one and simulates reaching the place by sleeping 1 second.
+- THe MAKE HYPOTHESIS state asks the server to get a new hint, it loads it on the ontology and retrieves the classes "COMPLETE" and "INCONISTENT" to check for consistency. If the hypothesis is consistent the executed state is REACH ORACLE, otherwise it will go back to the state EXPLORE.
+- The state REACH ORACLE just simulates reaching the oracle posistion by sleeping 1 second. The possibility that this state fails is implemented in the state machine, but never executed. The possibility is left for future implementations where an actual sction will be implemented. Onche the oracle is reached, the next executed state is DELIVER HYPOTHESIS.
+- The DELIVER HYPOTHESIS state gets the person, weapon and place of the hypothesis and express it in natural language. The next state is HYPOTHESIS CHECK
+- The state HYPOTHESIS CHECK calls the server "verify solution" to compare the hypothesis with the right one. If all the booleans returned are true the game ends, otherwise the hypothesis is wrong and the program executes the state EXPLORE.
+
+The nodes communicate with some customized services:
+- "/verify_solution" of type Compare
+- '/generate_murder' of type Hypothesis
+- '/get_hint' of type Hints\end{DoxyVerb}
+ 

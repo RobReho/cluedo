@@ -1,0 +1,80 @@
+First assignment for the Experimental Robotic Lab course a.\+y.\+2021/2022\hypertarget{md__r_e_a_d_m_e_autotoc_md1}{}\doxysection{Introduction}\label{md__r_e_a_d_m_e_autotoc_md1}
+At this stage of the project, the robot is a point that aims to explore its environment and deduce hypotheses based on hints it finds in different rooms. The robot has been designed to move randomly through the environment, entering different rooms and looking around for hints to make hypotheses. If a consistent hypothesis can be deduced, the robot will go to a designated location and express it in English. If the hypothesis is incorrect, the robot will continue exploring and finding new hints until a correct hypothesis is deduced.\hypertarget{md__r_e_a_d_m_e_autotoc_md2}{}\doxysection{Software architecture}\label{md__r_e_a_d_m_e_autotoc_md2}
+\hypertarget{md__r_e_a_d_m_e_autotoc_md3}{}\doxysubsection{R\+O\+S nodes}\label{md__r_e_a_d_m_e_autotoc_md3}
+The nodes in this package are\+:
+\begin{DoxyItemize}
+\item \char`\"{}cluedo\+\_\+state\+\_\+machine\char`\"{}\+: handles the communication with the A\+R\+M\+OR server.
+\item \char`\"{}oracle\char`\"{}\+: controls the hints generation and holds the solution of the game.
+\item \char`\"{}user\+\_\+interface\char`\"{}\+: subscribes to the other node\textquotesingle{}s messages and prints the on the terminal. The node is not represented in the following diagrams for sake of semplicity.
+\end{DoxyItemize}\hypertarget{md__r_e_a_d_m_e_autotoc_md4}{}\doxysubsection{R\+O\+S services}\label{md__r_e_a_d_m_e_autotoc_md4}
+The nodes communicate with some customized services\+:
+\begin{DoxyItemize}
+\item \char`\"{}/verify\+\_\+solution\char`\"{} of type Compare
+\item \textquotesingle{}/generate\+\_\+murder\textquotesingle{} of type Hypothesis
+\item \textquotesingle{}/get\+\_\+hint\textquotesingle{} of type Hints
+\end{DoxyItemize}\hypertarget{md__r_e_a_d_m_e_autotoc_md5}{}\doxysubsection{Temporal Diagram}\label{md__r_e_a_d_m_e_autotoc_md5}
+In the following temporal diagram is showed he communication between the nodes. ~\newline
+
+
+ ~\newline
+
+
+The initialization is handled by the \char`\"{}cluedo\+\_\+state\+\_\+machine\char`\"{} node, which calls the appropriate services of the A\+R\+M\+OR server to make the ontology ready for the game and calls the service server /generate\+\_\+murder to generate a winning hypothesis and store it for the following comparisons. During the game, the \char`\"{}cluedo\+\_\+state\+\_\+machine\char`\"{} node asks for hints to the oracle by calling the service /get\+\_\+hint, and it gets a hypothesis. Such hypothesis will be uploaded to the ontology, and the A\+R\+M\+OR server will be asked to reason with the new information and retrieve the classes \char`\"{}\+C\+O\+M\+P\+L\+E\+T\+E\char`\"{} and \char`\"{}\+I\+N\+C\+O\+N\+I\+S\+T\+E\+N\+T\char`\"{}. If the hypothesis just uploaded is part of the class \char`\"{}\+C\+O\+M\+P\+L\+E\+T\+E\char`\"{} but not of the class \char`\"{}\+I\+N\+C\+O\+N\+I\+S\+T\+E\+N\+T\char`\"{}, that means that it is a consistent hypothesis and can be queried to the Oracle. The \char`\"{}cluedo\+\_\+state\+\_\+machine\char`\"{} node does so by calling the service /verify\+\_\+solution that will return 3 booleans for each element of the hypothesis (person, weapon, place). If all the booleans are true, the hypothesis is correct, and the game ends.\hypertarget{md__r_e_a_d_m_e_autotoc_md6}{}\doxysubsection{State Machine}\label{md__r_e_a_d_m_e_autotoc_md6}
+The different states implement with the Smach package are showed below. ~\newline
+
+
+ ~\newline
+
+
+The states are implemented in the \char`\"{}cluedo\+\_\+state\+\_\+machine\char`\"{} node.
+\begin{DoxyItemize}
+\item The I\+N\+IT state establishes communication with the Armor server, loads the O\+WL file, calls the \char`\"{}generate murder\char`\"{} service to start the game, and retrieves the list of people, weapons, and places from the O\+WL.
+\item The E\+X\+P\+L\+O\+RE state retrieves the list of available places, randomly chooses one, and simulates reaching the place by sleeping for 1 second.
+\item The M\+A\+KE H\+Y\+P\+O\+T\+H\+E\+S\+IS state asks the server to provide a new hint, loads it onto the ontology, and retrieves the classes \char`\"{}\+C\+O\+M\+P\+L\+E\+T\+E\char`\"{} and \char`\"{}\+I\+N\+C\+O\+N\+S\+I\+S\+T\+E\+N\+T\char`\"{} to check for consistency. If the hypothesis is consistent, the executed state is R\+E\+A\+CH O\+R\+A\+C\+LE; otherwise, it goes back to the E\+X\+P\+L\+O\+RE state.
+\item The R\+E\+A\+CH O\+R\+A\+C\+LE state simulates reaching the oracle position by sleeping for 1 second. Although the possibility of this state failing is implemented in the state machine, it is never executed. The possibility is left for future implementations where an actual action will be implemented. Once the oracle is reached, the next executed state is D\+E\+L\+I\+V\+ER H\+Y\+P\+O\+T\+H\+E\+S\+IS.
+\item The D\+E\+L\+I\+V\+ER H\+Y\+P\+O\+T\+H\+E\+S\+IS state gets the person, weapon, and place of the hypothesis and expresses it in natural language. The next state is H\+Y\+P\+O\+T\+H\+E\+S\+IS C\+H\+E\+CK.
+\item The H\+Y\+P\+O\+T\+H\+E\+S\+IS C\+H\+E\+CK state calls the \char`\"{}verify solution\char`\"{} server to compare the hypothesis with the correct one. If all the booleans returned are true, the game ends; otherwise, the hypothesis is wrong, and the program executes the E\+X\+P\+L\+O\+RE state. 
+\end{DoxyItemize}\hypertarget{md__r_e_a_d_m_e_autotoc_md7}{}\doxysection{Installation and Running}\label{md__r_e_a_d_m_e_autotoc_md7}
+This project needs some external packages. You can install them in your R\+OS workspace\+: ~\newline
+ A\+R\+M\+OR 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{git clone https://github.com/EmaroLab/armor.git}
+\end{DoxyCode}
+
+
+S\+M\+A\+SH 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{git clone https://github.com/ros/executive\_smach.git}
+\DoxyCodeLine{git clone https://github.com/ros-\/visualization/executive\_smach\_visualization.git}
+\end{DoxyCode}
+
+
+To install the package clone the repository in your R\+OS workspace\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{git clone https://github.com/RobReho/exproblab.git}
+\end{DoxyCode}
+
+
+then build your R\+OS workspace\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{catkin\_make}
+\end{DoxyCode}
+
+
+To run the project launch the mani launch file\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{roslaunch cluedo launcher.launch}
+\end{DoxyCode}
+
+
+To visualize the Smash state machine graph, run in another tab\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{rosrun smach\_viewer smach\_viewer.py}
+\end{DoxyCode}
+\hypertarget{md__r_e_a_d_m_e_autotoc_md8}{}\doxysection{Demo}\label{md__r_e_a_d_m_e_autotoc_md8}
+\hypertarget{md__r_e_a_d_m_e_autotoc_md9}{}\doxysection{Working hypothesis and environment.}\label{md__r_e_a_d_m_e_autotoc_md9}
+\hypertarget{md__r_e_a_d_m_e_autotoc_md10}{}\doxysubsection{System features}\label{md__r_e_a_d_m_e_autotoc_md10}
+The game is a revisited simulated Cluedo game, where the player is the robot implemented by the state machine, and the game is controlled by the Oracle. The Oracle generates the hypothesis by choosing random elements in the people, weapons, and places arrays. Randomly, it might generate an inconsistent hypothesis, meaning that it will be composed of 4 elements instead of 3. The robot will get both consistent and inconsistent hypotheses and send back only the consistent hypothesis to be compared with the solution. When a hypothesis is compared to the solution, the hints that don\textquotesingle{}t match are discarded from the hints arrays stored in the Oracle node. As more hypotheses are compared, it becomes more and more likely that the proposed hypothesis matches the solution. \hypertarget{md__r_e_a_d_m_e_autotoc_md11}{}\doxysubsection{System limitations}\label{md__r_e_a_d_m_e_autotoc_md11}
+The game implemented has a very simple structure and does not use any I\+Ds associated with the hypothesis. The architecture of the game has a very different way of generating and handling hypotheses compared to the following iterations. Nevertheless, the simplicity of the architecture makes it easy to adapt to future implementations. \hypertarget{md__r_e_a_d_m_e_autotoc_md12}{}\doxysubsection{Possible technical Improvements}\label{md__r_e_a_d_m_e_autotoc_md12}
+Possible improvements include a system that generates hints in a similar way to what happens in the following iterations.\hypertarget{md__r_e_a_d_m_e_autotoc_md13}{}\doxysection{Contacts}\label{md__r_e_a_d_m_e_autotoc_md13}
+Roberta Reho\+: \href{mailto:s5075214@studenti.unige.it}{\texttt{ s5075214@studenti.\+unige.\+it}} 
